@@ -118,3 +118,8 @@ You only run `./rebuild.sh` when you change something that isn't just a symlinke
 
 The first time you launch `nvim`, it bootstraps [lazy.nvim](https://github.com/folke/lazy.nvim) by cloning plugins from GitHub.
 That needs network access once; after that it's offline.
+
+## License
+
+This repo is licensed under MIT No Attribution.
+See `LICENSE`.
