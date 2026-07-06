@@ -15,7 +15,7 @@
   };
 
   outputs = inputs@{ self, nix-darwin, nix-homebrew, home-manager, nixpkgs }: {
-    darwinConfigurations."mac" = nix-darwin.lib.darwinSystem {
+    darwinConfigurations."macmini" = nix-darwin.lib.darwinSystem {
       modules = [ 
         ./configuration.nix 
         nix-homebrew.darwinModules.nix-homebrew
@@ -23,7 +23,7 @@
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.users.kunchen = import ./home.nix;
+          home-manager.users.macmini = import ./home.nix;
         }
       ];
     };

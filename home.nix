@@ -5,8 +5,8 @@ let
 in
 
 {
-  home.username = "kunchen";
-  home.homeDirectory = "/Users/kunchen";
+  home.username = "macmini";
+  home.homeDirectory = "/Users/macmini";
   home.stateVersion = "24.11";
   home.packages = with pkgs; [
     # cli i use constantly
@@ -41,8 +41,8 @@ in
   };
 
   programs.git.settings.user = {
-    name = "kunchenguid";
-    email = "kun@kunchenguid.com";
+    name = "googlejam";
+    email = "goody1017@gmail.com";
   };
 
   programs.starship = {
