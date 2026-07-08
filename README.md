@@ -16,7 +16,7 @@ If you find a bug, please open a GitHub Issue using the bug report template.
 Running the switch builds:
 
 - System settings (dark mode, key repeat, dock, Finder, trackpad)
-- Homebrew apps (casks and CLI tools)
+- Homebrew apps and CLI tools (AI agents, remote access, terminal, editor, local dev)
 - Nix user packages (ripgrep, fd, fzf, jq, lazygit, Neovim, Hack Nerd Font)
 - Shell (zsh, aliases, starship prompt)
 - Editor (Neovim config)
@@ -108,6 +108,8 @@ programs.git = {
 That means every time you switch, Homebrew removes any package or cask on your machine that isn't listed in the `brews` and `casks` arrays in `configuration.nix`.
 If you already have Homebrew stuff installed that isn't in that list, the first switch will uninstall it.
 Read through `brews` and `casks` before you run `bootstrap.sh` or `rebuild.sh` for the first time, and add anything you want to keep.
+This profile currently preserves the high-confidence tools found in active use on mini's machine: Cursor, Claude/Claude Code, Codex, opencode, Antigravity, Tailscale, NoMachine, OrbStack, Obsidian, RustDesk, 1Password, Android platform tools, GitHub CLI, just, uv, tmux, Node, Coreutils, and ffmpeg-full.
+Anything else installed manually or through Homebrew should be treated as at risk until you either add it here or intentionally let `zap` remove it.
 
 **About `herdr`:** it's in the `brews` list.
 It's a real public Homebrew formula (`brew info herdr` finds it in homebrew-core, no tap needed), so it will install fine.

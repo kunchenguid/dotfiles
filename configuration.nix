@@ -31,15 +31,38 @@
   };
   homebrew = {
     enable = true;
-    onActivation.cleanup = "zap";  # remove anything not listed here
+    # High impact: `zap` removes Homebrew items not listed below on switch.
+    # Review brews/casks before bootstrap or rebuild on an existing machine.
+    onActivation.cleanup = "zap";
     onActivation.autoUpdate = true;
     onActivation.extraFlags = [ "--force" ];
     brews = [
+      "coreutils"
+      "ffmpeg-full"
+      "gh"
       "herdr"
+      "just"
+      "node"
+      "opencode"
+      "tailscale"
+      "tmux"
+      "uv"
     ];
     casks = [
-      "wezterm"
+      "1password"
+      "1password-cli"
+      "android-platform-tools"
+      "antigravity"
+      "claude"
       "claude-code"
+      "codex"
+      "cursor"
+      "nomachine"
+      "obsidian"
+      "orbstack"
+      "rustdesk"
+      "tailscale-app"
+      "wezterm"
     ];
   };
 }
