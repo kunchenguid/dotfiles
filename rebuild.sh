@@ -2,4 +2,10 @@
 set -euo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 ln -sfn "$DIR" ~/.dotfiles
-exec sudo darwin-rebuild switch --flake ~/.dotfiles#mac
+HOST_LABEL="$(sed -nE 's/^[[:space:]]*hostLabel = "([^"]+)";.*/\1/p' "$DIR/flake.nix" | head -n1)"
+if [ -z "$HOST_LABEL" ]; then
+  echo "Could not find the single \"hostLabel = \" line in flake.nix." >&2
+  echo "Edit flake.nix yourself before continuing." >&2
+  exit 1
+fi
+exec sudo darwin-rebuild switch --flake ~/.dotfiles#"$HOST_LABEL"
