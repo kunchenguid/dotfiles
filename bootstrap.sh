@@ -54,6 +54,11 @@ echo "==> Step 4: first darwin-rebuild switch (pinned to nix-darwin-26.05)"
 # on PATH here. Resolve the absolute path first and invoke that instead.
 NIX_BIN="$(command -v nix)"
 FLAKE_HOST_LABEL="$(sed -nE 's/^[[:space:]]*hostLabel = "([^"]+)";.*/\1/p' "$DIR/flake.nix" | head -n1)"
+if [ -z "$FLAKE_HOST_LABEL" ]; then
+  echo "    Could not find the single \"hostLabel = \" line in flake.nix."
+  echo "    Edit flake.nix yourself before continuing."
+  exit 1
+fi
 sudo "$NIX_BIN" run github:nix-darwin/nix-darwin/nix-darwin-26.05#darwin-rebuild -- \
   switch --flake ~/.dotfiles#"$FLAKE_HOST_LABEL"
 # If this still fails with "nix: command not found", open a new terminal
