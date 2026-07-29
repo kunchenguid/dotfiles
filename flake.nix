@@ -19,14 +19,17 @@
       # The one username line to change if this isn't your machine.
       # bootstrap.sh offers to rewrite this for you if your macOS username differs.
       user = "thomasharper";
-      # The one host label to change if you want to rename the machine.
-      # rebuild.sh and bootstrap.sh read this value back out of flake.nix,
-      # so it only needs to be changed here.
+      # The one host label to change if you want to rename the machine, OR
+      # to pick this machine's profile: any value except the literal
+      # "basic" gets this Mac's personal casks too; "basic" gets dev
+      # tooling only (e.g. for a server). rebuild.sh and bootstrap.sh read
+      # this value back out of flake.nix, so it only needs to be changed
+      # here.
       hostLabel = "mac";
     in
     {
       darwinConfigurations.${hostLabel} = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit user; };
+        specialArgs = { inherit user; includePersonalCasks = hostLabel != "basic"; };
         modules = [
           ./configuration.nix
           nix-homebrew.darwinModules.nix-homebrew
