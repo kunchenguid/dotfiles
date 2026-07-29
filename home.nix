@@ -37,6 +37,8 @@ in
       m = "git switch main";
       cc = "claude --dangerously-skip-permissions";
       co = "codex --full-auto";
+      cpath = "echo -n `pwd`|pbcopy";
+      gitverify="ssh-add /Users/${user}/.ssh/id_rsa"
     };
   };
 
