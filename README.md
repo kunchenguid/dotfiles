@@ -127,8 +127,8 @@ If you don't use it, just remove it from `brews` in your copy.
   Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew, and declares the `hostLabel` machine; `includePersonalCasks` selects its cask profile.
 - `configuration.nix` - system-level config: macOS defaults, Homebrew.
 - `home.nix` - user-level config: shell, packages, prompt, and the symlinks described below.
-- `bootstrap.sh` / `rebuild.sh` - first switch and later changes.
-  Run this every time you make a change.
+- `bootstrap.sh` / `rebuild.sh` - first switch and later changes, respectively.
+  Run `rebuild.sh` every time you make a change.
 - `home/` - the actual config files that get symlinked into place (Neovim, WezTerm, herdr, Claude settings, the shared `AGENTS.md`).
 
 ## How the symlinks work
