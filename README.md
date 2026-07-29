@@ -86,7 +86,7 @@ If you clone it, review these before you run `bootstrap.sh`:
 
 - **Username**: run `./bootstrap.sh` (it detects your macOS username and offers to set it) OR change the single `user = "kunchen"` line in `flake.nix`.
   Everything else (`configuration.nix`, `home.nix`, home directory paths) is threaded from that one variable.
-- **Host label**: change the single `hostLabel = "mac";` line in `flake.nix` (`rebuild.sh`/`bootstrap.sh` read it back out, so nothing else needs editing). Purely cosmetic - see "Personal vs. basic brews and casks" for the profile toggle.
+- **Host label**: change the single `hostLabel = "mac";` line in `flake.nix` (`rebuild.sh`/`bootstrap.sh` read it back out, so nothing else needs editing).
 - **CPU architecture**, `hostPlatform` in `configuration.nix` (see Prerequisites above).
 
 **Git identity:** this config deliberately does not set your git name or email.
@@ -112,7 +112,7 @@ Read through `brews` and `casks` before you run `bootstrap.sh` or `rebuild.sh` f
 It's a real public Homebrew formula (`brew info herdr` finds it in homebrew-core, no tap needed), so it will install fine.
 If you don't use it, just remove it from `basicBrews` in your copy.
 
-**Personal vs. basic brews and casks:** `configuration.nix` splits both `brews` and `casks` into `basicBrews`/`basicCasks` (dev tooling: herdr, thefuck, skills, wezterm, claude-code) and `personalBrews`/`personalCasks` (this Mac's GUI apps: Slack, Discord, Spotify, Notion, Figma). One toggle controls both: flip `includePersonalCasks` in `flake.nix` to `false` for dev tooling only - handy for a second, non-personal machine (e.g. a server). Still macOS-only.
+**Personal vs. basic brews and casks:** `configuration.nix` splits both `brews` and `casks` into `basicBrews`/`basicCasks` (dev tooling: herdr, thefuck, skills, wezterm, claude-code) and `personalBrews`/`personalCasks` (this Mac's GUI apps: Slack, Discord, Spotify, Notion, Figma). One toggle controls both: flip `usePersonalSetup` in `flake.nix` to `false` for dev tooling only - handy for a second, non-personal machine (e.g. a server). Still macOS-only.
 
 **Heads-up:**
 
@@ -124,7 +124,7 @@ If you don't use it, just remove it from `basicBrews` in your copy.
 ## Repo tour
 
 - `flake.nix` - the entry point.
-  Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew, and declares the `hostLabel` machine; `includePersonalCasks` selects its brews/casks profile.
+  Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew, and declares the `hostLabel` machine; `usePersonalSetup` selects its brews/casks profile.
 - `configuration.nix` - system-level config: macOS defaults, Homebrew.
 - `home.nix` - user-level config: shell, packages, prompt, and the symlinks described below.
 - `bootstrap.sh` / `rebuild.sh` - first switch and later changes, respectively.

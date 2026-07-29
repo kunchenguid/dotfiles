@@ -1,4 +1,4 @@
-{ user, lib, includePersonalCasks, ... }:
+{ user, lib, usePersonalSetup, ... }:
 
 let
   # Dev tooling wanted on every machine, personal or not - reuse this list
@@ -59,7 +59,7 @@ in
     onActivation.cleanup = "zap";  # remove anything not listed here
     onActivation.autoUpdate = true;
     onActivation.extraFlags = [ "--force" ];
-    brews = basicBrews ++ lib.optionals includePersonalCasks personalBrews;
-    casks = basicCasks ++ lib.optionals includePersonalCasks personalCasks;
+    brews = basicBrews ++ lib.optionals usePersonalSetup personalBrews;
+    casks = basicCasks ++ lib.optionals usePersonalSetup personalCasks;
   };
 }
