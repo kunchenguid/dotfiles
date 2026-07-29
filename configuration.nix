@@ -37,6 +37,7 @@
     brews = [
       "herdr"
       "thefuck"
+      "skills"
     ];
     casks = [
       "wezterm"
