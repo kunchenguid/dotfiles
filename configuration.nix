@@ -1,5 +1,22 @@
-{ user, ... }:
+{ user, lib, includePersonalCasks, ... }:
 
+let
+  # Dev tooling wanted on every machine, personal or not - reuse this list
+  # as-is on any future second machine (server or otherwise).
+  basicCasks = [
+    "wezterm"
+    "claude-code"
+  ];
+  # GUI apps for this personal Mac only - leave these out of any other
+  # machine's cask list.
+  personalCasks = [
+    "slack"
+    "discord"
+    "spotify"
+    "notion"
+    "figma"
+  ];
+in
 {
   # Determinate already manages the Nix daemon, so nix-darwin shouldn't.
   nix.enable = false;
@@ -39,14 +56,6 @@
       "thefuck"
       "skills"
     ];
-    casks = [
-      "wezterm"
-      "claude-code"
-      "slack"
-      "discord"
-      "spotify"
-      "notion"
-      "figma"
-    ];
+    casks = basicCasks ++ lib.optionals includePersonalCasks personalCasks;
   };
 }

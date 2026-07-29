@@ -86,8 +86,7 @@ If you clone it, review these before you run `bootstrap.sh`:
 
 - **Username**: run `./bootstrap.sh` (it detects your macOS username and offers to set it) OR change the single `user = "kunchen"` line in `flake.nix`.
   Everything else (`configuration.nix`, `home.nix`, home directory paths) is threaded from that one variable.
-- **Host label**: change the single `hostLabel = "mac";` line in `flake.nix`.
-  `rebuild.sh` and `bootstrap.sh` both read that value back out of `flake.nix`, so they never need editing directly.
+- **Host label**: change the single `hostLabel = "mac";` line in `flake.nix` (`rebuild.sh`/`bootstrap.sh` read it back out, so nothing else needs editing). Purely cosmetic - see "Personal vs. basic casks" for the cask toggle.
 - **CPU architecture**, `hostPlatform` in `configuration.nix` (see Prerequisites above).
 
 **Git identity:** this config deliberately does not set your git name or email.
@@ -113,6 +112,8 @@ Read through `brews` and `casks` before you run `bootstrap.sh` or `rebuild.sh` f
 It's a real public Homebrew formula (`brew info herdr` finds it in homebrew-core, no tap needed), so it will install fine.
 If you don't use it, just remove it from `brews` in your copy.
 
+**Personal vs. basic casks:** `configuration.nix` splits casks into `basicCasks` (dev tooling: wezterm, claude-code) and `personalCasks` (this Mac's GUI apps: Slack, Discord, Spotify, Notion, Figma). Flip `includePersonalCasks` in `flake.nix` to `false` for dev tooling only - handy for a second, non-personal machine (e.g. a server). Still macOS-only.
+
 **Heads-up:**
 
 - `home/AGENTS.md` is my personal agent policy, and `home.nix` installs it for Claude, Codex, and opencode.
@@ -123,11 +124,11 @@ If you don't use it, just remove it from `brews` in your copy.
 ## Repo tour
 
 - `flake.nix` - the entry point.
-  Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew, and declares the `mac` machine.
+  Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew, and declares the `hostLabel` machine; `includePersonalCasks` selects its cask profile.
 - `configuration.nix` - system-level config: macOS defaults, Homebrew.
 - `home.nix` - user-level config: shell, packages, prompt, and the symlinks described below.
-- `rebuild.sh` - re-applies the config after the first switch.
-  Run this every time you make a change.
+- `bootstrap.sh` / `rebuild.sh` - first switch and later changes, respectively.
+  Run `rebuild.sh` every time you make a change.
 - `home/` - the actual config files that get symlinked into place (Neovim, WezTerm, herdr, Claude settings, the shared `AGENTS.md`).
 
 ## How the symlinks work
