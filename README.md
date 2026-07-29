@@ -112,7 +112,7 @@ Read through `brews` and `casks` before you run `bootstrap.sh` or `rebuild.sh` f
 It's a real public Homebrew formula (`brew info herdr` finds it in homebrew-core, no tap needed), so it will install fine.
 If you don't use it, just remove it from `basicBrews` in your copy.
 
-**Personal vs. basic brews and casks:** `configuration.nix` splits both `brews` and `casks` into `basicBrews`/`basicCasks` (dev tooling: herdr, thefuck, skills, wezterm, claude-code) and `personalBrews`/`personalCasks` (this Mac's GUI apps: Slack, Discord, Spotify, Notion, Figma). One toggle controls both: flip `usePersonalSetup` in `flake.nix` to `false` for dev tooling only - handy for a second, non-personal machine (e.g. a server). Still macOS-only.
+**Personal vs. basic brews and casks:** `configuration.nix` splits both `brews` and `casks` into `basicBrews`/`basicCasks` (dev tooling wanted on any machine: herdr, thefuck, skills, wezterm, claude-code, codex) and `personalBrews`/`personalCasks` (this Mac's own toolchain and GUI apps: Slack, Discord, Notion, Figma, a smart-contract toolchain, a Python/Postgres toolchain, and more). One toggle controls both: flip `usePersonalSetup` in `flake.nix` to `false` for dev tooling only - handy for a second, non-personal machine (e.g. a server). Still macOS-only.
 
 **Heads-up:**
 

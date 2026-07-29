@@ -6,15 +6,24 @@ let
   basicCasks = [
     "wezterm"
     "claude-code"
+    "codex"
   ];
   # GUI apps for this personal Mac only - leave these out of any other
   # machine's cask list.
   personalCasks = [
     "slack"
     "discord"
-    "spotify"
     "notion"
     "figma"
+    "altair-graphql-client"
+    "mongodb-compass"
+    "todoist"
+    "anki"
+    "ipfs"
+    "ipfs-desktop"
+    "iterm2"
+    "vlc"
+    "zoom"
   ];
   # CLI tools wanted on every machine, personal or not.
   basicBrews = [
@@ -23,7 +32,36 @@ let
     "skills"
   ];
   # CLI tools for this personal Mac only.
-  personalBrews = [ ];
+  personalBrews = [
+    # Smart-contract toolchain
+    "echidna"
+    "solidity"
+    "solc-select"
+    "plz-cli"
+    "ocaml"
+    "opam"
+    "tenderly/tenderly/tenderly"
+    "antoniorodr/memo/memo"
+    # Python / Postgres toolchain
+    "postgresql@15"
+    "libpq"
+    "pyenv"
+    "python@3.11"
+    # Everything else already installed on this Mac
+    "asdf"
+    "bzip2"
+    "cmake"
+    "ekhtml"
+    "ffmpeg"
+    "gh"
+    "git-filter-repo"
+    "gnu-tar"
+    "lcov"
+    "libusb"
+    "tree"
+    "wget"
+    "yarn"
+  ];
 in
 {
   # Determinate already manages the Nix daemon, so nix-darwin shouldn't.
