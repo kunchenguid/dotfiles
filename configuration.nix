@@ -18,10 +18,9 @@ let
     "figma"
     "altair-graphql-client"
     "mongodb-compass"
-    "todoist"
+    "todoist-app"
     "anki"
     "iterm2"
-    "vlc"
     "zoom"
   ];
   # CLI tools wanted on every machine, personal or not.
@@ -34,7 +33,6 @@ let
   personalBrews = [
     # Smart-contract toolchain
     "echidna"
-    "solidity"
     "solc-select"
     "tenderly/tenderly/tenderly"
     # Python / Postgres toolchain
@@ -84,6 +82,7 @@ in
   nix-homebrew = {
     enable = true;
     inherit user;
+    autoMigrate = true;
   };
   homebrew = {
     enable = true;

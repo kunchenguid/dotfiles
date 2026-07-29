@@ -8,4 +8,4 @@ if [ -z "$HOST_LABEL" ]; then
   echo "Edit flake.nix yourself before continuing." >&2
   exit 1
 fi
-exec sudo darwin-rebuild switch --flake ~/.dotfiles#"$HOST_LABEL"
+exec sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ~/.dotfiles#"$HOST_LABEL"
