@@ -22,11 +22,11 @@
       # The one host label to change if you want to rename the machine.
       # rebuild.sh and bootstrap.sh read this back out of flake.nix, so it
       # only needs to be changed here. Purely cosmetic - see
-      # includePersonalCasks below for the cask profile.
+      # includePersonalCasks below for the brews/casks profile.
       hostLabel = "mac";
-      # true installs this Mac's personal GUI apps (Slack, Discord,
-      # Spotify, Notion, Figma) alongside the shared dev tooling; false
-      # installs dev tooling only (e.g. for a server).
+      # true installs this Mac's personal brews and GUI casks (Slack,
+      # Discord, Spotify, Notion, Figma) alongside the shared dev tooling;
+      # false installs dev tooling only (e.g. for a server).
       includePersonalCasks = true;
     in
     {

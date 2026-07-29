@@ -124,7 +124,7 @@ If you don't use it, just remove it from `basicBrews` in your copy.
 ## Repo tour
 
 - `flake.nix` - the entry point.
-  Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew, and declares the `hostLabel` machine; `includePersonalCasks` selects its cask profile.
+  Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew, and declares the `hostLabel` machine; `includePersonalCasks` selects its brews/casks profile.
 - `configuration.nix` - system-level config: macOS defaults, Homebrew.
 - `home.nix` - user-level config: shell, packages, prompt, and the symlinks described below.
 - `bootstrap.sh` / `rebuild.sh` - first switch and later changes, respectively.
