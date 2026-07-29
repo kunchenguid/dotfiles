@@ -36,10 +36,16 @@
     onActivation.extraFlags = [ "--force" ];
     brews = [
       "herdr"
+      "thefuck"
     ];
     casks = [
       "wezterm"
       "claude-code"
+      "slack"
+      "discord"
+      "spotify"
+      "notion"
+      "figma"
     ];
   };
 }
