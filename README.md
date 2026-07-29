@@ -87,7 +87,7 @@ If you clone it, review these before you run `bootstrap.sh`:
 - **Username**: run `./bootstrap.sh` (it detects your macOS username and offers to set it) OR change the single `user = "kunchen"` line in `flake.nix`.
   Everything else (`configuration.nix`, `home.nix`, home directory paths) is threaded from that one variable.
 - **Host label**: change the single `hostLabel = "mac";` line in `flake.nix`.
-  `rebuild.sh` and `bootstrap.sh` both read that value back out of `flake.nix`, so they never need editing directly. This also picks your profile - see "Personal vs. basic casks" below for what the special value `"basic"` does.
+  `rebuild.sh` and `bootstrap.sh` both read that value back out of `flake.nix`, so they never need editing directly. Purely cosmetic - see "Personal vs. basic casks" below for the separate toggle that controls which casks you get.
 - **CPU architecture**, `hostPlatform` in `configuration.nix` (see Prerequisites above).
 
 **Git identity:** this config deliberately does not set your git name or email.
@@ -115,14 +115,14 @@ If you don't use it, just remove it from `brews` in your copy.
 
 **Personal vs. basic casks:** `configuration.nix` splits its cask list into `basicCasks` (dev tooling: wezterm, claude-code) and `personalCasks` (this Mac's GUI apps: Slack, Discord, Spotify, Notion, Figma).
 
-`hostLabel` in `flake.nix` picks which you get: set it to the literal value `"basic"` for dev tooling only (e.g. a server); any other value (including the default `"mac"`) gets both. There's nothing else to edit - `bootstrap.sh`/`rebuild.sh` already read `hostLabel` back out of `flake.nix`:
+The single `includePersonalCasks = true;` line in `flake.nix` controls which you get, completely separate from `hostLabel` above - flip it to `false` for dev tooling only (e.g. a server), regardless of what you've named the machine. There's nothing else to edit - `bootstrap.sh`/`rebuild.sh` already read the flake config, so the normal workflow applies unchanged:
 
 ```sh
 ./bootstrap.sh   # fresh machine, first switch
 ./rebuild.sh     # every change after that
 ```
 
-`"basic"` is a reserved value for this purpose - if you want to rename the machine to something else, pick anything other than `"basic"`. This is still macOS-only - if a future second machine turns out to be Linux instead, that needs separate, not-yet-built support.
+This is still macOS-only - if a future second machine turns out to be Linux instead, that needs separate, not-yet-built support.
 
 **Heads-up:**
 
@@ -134,7 +134,7 @@ If you don't use it, just remove it from `brews` in your copy.
 ## Repo tour
 
 - `flake.nix` - the entry point.
-  Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew, and declares the `hostLabel` machine (its value also picks the personal-vs-basic profile).
+  Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew, and declares the `hostLabel` machine, with `includePersonalCasks` selecting its cask profile.
 - `configuration.nix` - system-level config: macOS defaults, Homebrew.
 - `home.nix` - user-level config: shell, packages, prompt, and the symlinks described below.
 - `bootstrap.sh` / `rebuild.sh` - first switch and later changes.
