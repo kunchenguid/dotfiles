@@ -7,6 +7,7 @@ let
     "wezterm"
     "claude-code"
     "codex"
+    "opensuperwhisper"
   ];
   # GUI apps for this personal Mac only - leave these out of any other
   # machine's cask list.
