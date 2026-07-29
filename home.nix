@@ -40,6 +40,14 @@ in
     };
   };
 
+  programs.git = {
+    enable = true;
+    settings.user = {
+      name = "tommyrharper";
+      email = "thomasrobertharper@gmail.com";
+    };
+  };
+
   programs.starship = {
     enable = true;
     settings = {
