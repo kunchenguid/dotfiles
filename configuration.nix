@@ -16,6 +16,14 @@ let
     "notion"
     "figma"
   ];
+  # CLI tools wanted on every machine, personal or not.
+  basicBrews = [
+    "herdr"
+    "thefuck"
+    "skills"
+  ];
+  # CLI tools for this personal Mac only.
+  personalBrews = [ ];
 in
 {
   # Determinate already manages the Nix daemon, so nix-darwin shouldn't.
@@ -51,11 +59,7 @@ in
     onActivation.cleanup = "zap";  # remove anything not listed here
     onActivation.autoUpdate = true;
     onActivation.extraFlags = [ "--force" ];
-    brews = [
-      "herdr"
-      "thefuck"
-      "skills"
-    ];
+    brews = basicBrews ++ lib.optionals includePersonalCasks personalBrews;
     casks = basicCasks ++ lib.optionals includePersonalCasks personalCasks;
   };
 }
