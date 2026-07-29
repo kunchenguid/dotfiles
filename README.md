@@ -108,6 +108,13 @@ That means every time you switch, Homebrew removes any package or cask on your m
 If you already have Homebrew stuff installed that isn't in that list, the first switch will uninstall it.
 Read through `brews` and `casks` before you run `bootstrap.sh` or `rebuild.sh` for the first time, and add anything you want to keep.
 
+**Existing Homebrew install:** `configuration.nix` sets `nix-homebrew.autoMigrate = true`, so if `/opt/homebrew` already has a non-Nix Homebrew install on it (common on a Mac you were already using), the first switch migrates it in place under nix-homebrew's management instead of erroring out. Your existing taps and packages are kept; the `zap` cleanup above still applies on top of that.
+
+**Existing dotfiles:** `flake.nix` sets `home-manager.backupFileExtension = "before-home-manager"`.
+On a Mac you were already using, files like `~/.zshrc`, `~/.zshenv`, or `~/.claude/settings.json` likely already exist.
+Without this setting, home-manager refuses to activate rather than clobber them.
+With it, the first switch moves each conflicting file to `<name>.before-home-manager` next to it and links in this repo's version instead - diff the two afterward if you want to carry anything over.
+
 **About `herdr`:** it's in the `basicBrews` list.
 It's a real public Homebrew formula (`brew info herdr` finds it in homebrew-core, no tap needed), so it will install fine.
 If you don't use it, just remove it from `basicBrews` in your copy.
@@ -129,6 +136,8 @@ If you don't use it, just remove it from `basicBrews` in your copy.
 - `home.nix` - user-level config: shell, packages, prompt, and the symlinks described below.
 - `bootstrap.sh` / `rebuild.sh` - first switch and later changes, respectively.
   Run `rebuild.sh` every time you make a change.
+  `rebuild.sh` calls `sudo /run/current-system/sw/bin/darwin-rebuild` by its full path rather than plain `darwin-rebuild`: `sudo` looks commands up through its own `secure_path`, not your shell's `PATH`, so a bare name can fail with "command not found" even once `darwin-rebuild` is on your PATH.
+  `/run/current-system/sw/bin` is a symlink nix-darwin itself keeps pointed at the current generation, so this stays correct across rebuilds and machines.
 - `home/` - the actual config files that get symlinked into place (Neovim, WezTerm, herdr, Claude settings, the shared `AGENTS.md`).
 
 ## How the symlinks work
