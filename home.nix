@@ -21,6 +21,7 @@ in
   ];
   fonts.fontconfig.enable = true;
   home.sessionVariables.EDITOR = "nvim";
+  home.sessionVariables.CLICOLOR = "1";
 
   programs.zsh = {
     enable = true;
