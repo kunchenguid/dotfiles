@@ -40,6 +40,8 @@ in
       co = "codex --full-auto";
       cpath = "echo -n `pwd`|pbcopy";
       gitverify = "ssh-add /Users/${user}/.ssh/id_rsa";
+      disablesleep = "sudo pmset -a disablesleep 1";
+      enablesleep = "sudo pmset -a disablesleep 0";
     };
   };
 
