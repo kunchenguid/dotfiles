@@ -13,6 +13,10 @@ close_tab = "prefix+ampersand"
 workspace_picker = "prefix+w"
 goto             = "prefix+g"
 copy_mode  = "prefix+y"  # herdr's copy-mode entry key; copy-mode's own internal keys (v/space select, y/Enter copy, q/Esc cancel) aren't configurable
+# Navigate-mode movement. These local shortcuts win while navigate mode is open.
+# They are independent from focus_pane_*. Do not include prefix+, esc, enter, tab, or 1..9 here.
+navigate_workspace_up = "j"
+navigate_workspace_down = "k"
 
 [ui]
 # Agents panel order: explicit choice of "spaces" (grouped by space, the default) over "priority".
