@@ -22,6 +22,7 @@ Running the switch builds:
 - Editor (Neovim config with the rose-pine moon theme)
 - Terminal (WezTerm config with the rose-pine moon theme and dimmed unfocused windows)
 - Agent configs (Claude, Codex, opencode all share one AGENTS.md)
+- Optional Pi theme, generic UI settings, model overrides, and terminal-title extension
 
 ## Prerequisites
 
@@ -135,6 +136,24 @@ If you don't use it, just remove it from `brews` in your copy.
 The files under `home/` are the real files - editing them here is editing your live config, no rebuild needed to see the change in your editor.
 `home.nix` uses `mkOutOfStoreSymlink` to point paths like `~/.config/nvim` straight at `home/.config/nvim` in this repo, so the two never drift out of sync.
 You only run `./rebuild.sh` when you change something that isn't just a symlinked file, like a package list or a system default.
+
+## Optional Pi configuration
+
+Pi is an opt-in CLI, not a dependency this repository vendors. Install it from its owner with the [official Pi instructions](https://pi.dev), for example:
+
+```sh
+npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+```
+
+[Pi Launcher](https://github.com/kunchenguid/homebrew-tap) is also optional and installed from its owner, not declared by this config:
+
+```sh
+brew install --cask kunchenguid/tap/pi-launcher
+```
+
+Home Manager links only four authored Pi files: the theme, `models.json`, `settings.json`, and `terminal-status-title.js`. It deliberately does not manage `~/.pi/agent`, so `auth.json`, sessions, trust decisions, caches, and other runtime state remain local. The model overrides contain no credentials or endpoint settings, do not choose a default model, and only take effect after you authenticate Pi yourself. Pi may intentionally rewrite the tracked settings file. Review any drift and commit it only when it is a deliberate configuration change.
+
+The terminal-title extension shows a spinner while Pi is working, then a completion mark with the session name or current directory. Run `/reload` after editing it. The `rose-pine-moon` theme was authored clean-room from the public [Rosé Pine Moon palette](https://rosepinetheme.com/palette) and Pi's [public theme schema](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json), not from a private or live theme file. This is an additive post-video layer; it installs no packages or launcher configuration.
 
 ## Notes
 

@@ -8,5 +8,9 @@ home/.config/herdr/*.sock
 result
 result-*
 
+# Pi credentials and Home Manager adoption backups stay local
+/home/.pi/agent/auth.json
+/home/.pi/agent/*.backup
+
 # no-mistakes local validation state - never commit in this public repo
 .no-mistakes/

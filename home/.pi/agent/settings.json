@@ -1,0 +1,14 @@
+{
+  "images": {
+    "blockImages": false
+  },
+  "terminal": {
+    "showImages": false
+  },
+  "hideThinkingBlock": true,
+  "quietStartup": true,
+  "theme": "rose-pine-moon",
+  "steeringMode": "all",
+  "followUpMode": "all",
+  "collapseChangelog": true
+}

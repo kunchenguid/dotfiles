@@ -63,6 +63,16 @@ in
   home.file.".claude/settings.json".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.claude/settings.json";
 
+  # Keep Pi's credential and runtime state local by linking only authored files.
+  home.file.".pi/agent/themes/rose-pine-moon.json".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/themes/rose-pine-moon.json";
+  home.file.".pi/agent/models.json".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/models.json";
+  home.file.".pi/agent/settings.json".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/settings.json";
+  home.file.".pi/agent/extensions/terminal-status-title.js".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/extensions/terminal-status-title.js";
+
   home.file.".claude/CLAUDE.md".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
   home.file.".codex/AGENTS.md".source =
