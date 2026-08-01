@@ -370,8 +370,7 @@ const pi = {
   registerTool(tool) { tools.push(tool); },
 };
 extension.default(pi);
-const expected = ["read", "bash", "edit", "write", "grep", "find", "ls"];
-check(JSON.stringify(tools.map((tool) => tool.name)) === JSON.stringify(expected), "Calm did not wrap exactly Pi's known built-ins");
+check(tools.length === 0, "Calm replaced active tool definitions");
 const ui = {
   getEditorText: () => "",
   getToolsExpanded: () => false,
@@ -401,15 +400,15 @@ check(assistant.render(100).join("\\n").includes("PRIVATE_REASONING"), "expandin
 assistant.setHideThinkingBlock(true);
 
 const renderUi = { requestRender() {} };
-for (const tool of tools) {
-  const row = new ToolExecutionComponent(tool.name, `call-${tool.name}`, {}, { showImages: false }, tool, renderUi, process.cwd());
+for (const toolName of ["read", "bash", "edit", "write", "grep", "find", "ls"]) {
+  const row = new ToolExecutionComponent(toolName, `call-${toolName}`, {}, { showImages: false }, undefined, renderUi, process.cwd());
   row.markExecutionStarted();
   row.setArgsComplete();
-  row.updateResult({ content: [{ type: "text", text: `RESULT_${tool.name}` }], details: {}, isError: false });
-  check(row.render(100).length === 0, `${tool.name} left a supported call/result shell visible`);
+  row.updateResult({ content: [{ type: "text", text: `RESULT_${toolName}` }], details: {}, isError: false });
+  check(row.render(100).length === 0, `${toolName} left a supported call/result shell visible`);
   visibility.setCalmStockExportRendering(true);
   row.setExpanded(true);
-  check(row.render(100).length > 0, `${tool.name} was missing from stock export/share rendering`);
+  check(row.render(100).length > 0, `${toolName} was missing from stock export/share rendering`);
   visibility.setCalmStockExportRendering(false);
 }
 const custom = {
