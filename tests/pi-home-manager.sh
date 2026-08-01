@@ -64,8 +64,11 @@ ln -s "$home_manager_files/.pi/agent/extensions/terminal-status-title.js" \
 
 test "$(readlink "$fake_home/.pi/agent/themes/rose-pine-moon.json")" != \
   /Users/kunchen/.dotfiles/home/.pi/agent/themes/rose-pine-moon.json
+expected_theme_source=$(readlink -f \
+  /Users/kunchen/.dotfiles/home/.pi/agent/themes/rose-pine-moon.json)
+test -n "$expected_theme_source"
 test "$(readlink -f "$fake_home/.pi/agent/themes/rose-pine-moon.json")" = \
-  /Users/kunchen/.dotfiles/home/.pi/agent/themes/rose-pine-moon.json
+  "$expected_theme_source"
 
 # Execute only the generated pre-check migration block against a disposable HOME.
 awk '
