@@ -12,5 +12,8 @@ result-*
 /home/.pi/agent/auth.json
 /home/.pi/agent/**/*.backup
 
+# Pi Calm is a runtime toggle; its local state file is never tracked
+/home/.pi/agent/calm
+
 # no-mistakes local validation state - never commit in this public repo
 .no-mistakes/
