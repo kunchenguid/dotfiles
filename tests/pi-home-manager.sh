@@ -56,10 +56,16 @@ probe=$(mktemp -d)
 trap 'rm -rf "$probe"' EXIT
 fake_home="$probe/home"
 mkdir -p "$fake_home/.pi/agent/themes" "$fake_home/.pi/agent/extensions"
-ln -s /Users/kunchen/.dotfiles/home/.pi/agent/themes/rose-pine-moon.json \
+home_manager_files=$(readlink -f "$activation/home-files")
+ln -s "$home_manager_files/.pi/agent/themes/rose-pine-moon.json" \
   "$fake_home/.pi/agent/themes/rose-pine-moon.json"
-ln -s /Users/kunchen/.dotfiles/home/.pi/agent/extensions/terminal-status-title.js \
+ln -s "$home_manager_files/.pi/agent/extensions/terminal-status-title.js" \
   "$fake_home/.pi/agent/extensions/terminal-status-title.js"
+
+test "$(readlink "$fake_home/.pi/agent/themes/rose-pine-moon.json")" != \
+  /Users/kunchen/.dotfiles/home/.pi/agent/themes/rose-pine-moon.json
+test "$(readlink -f "$fake_home/.pi/agent/themes/rose-pine-moon.json")" = \
+  /Users/kunchen/.dotfiles/home/.pi/agent/themes/rose-pine-moon.json
 
 # Execute only the generated pre-check migration block against a disposable HOME.
 awk '

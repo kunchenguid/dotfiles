@@ -78,9 +78,17 @@ in
     removeLegacyPiLink() {
       local target="$1"
       local source="$2"
-      if [ -L "$target" ] && [ "$(readlink "$target")" = "$source" ]; then
-        $DRY_RUN_CMD rm "$target"
-      fi
+      local relativeTarget="''${target#"$HOME/"}"
+      local linkTarget
+
+      [ -L "$target" ] || return
+      linkTarget="$(readlink "$target")"
+      case "$linkTarget" in
+        /nix/store/*-home-manager-files/"$relativeTarget") ;;
+        *) return ;;
+      esac
+      [ "$(readlink -f "$target")" = "$(readlink -f "$source")" ] || return
+      $DRY_RUN_CMD rm "$target"
     }
 
     removeLegacyPiLink "$HOME/.pi/agent/themes/rose-pine-moon.json" "${dotfiles}/home/.pi/agent/themes/rose-pine-moon.json"
