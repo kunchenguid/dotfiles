@@ -1,4 +1,4 @@
-{ config, pkgs, user, ... }:
+{ config, lib, pkgs, user, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/.dotfiles";
@@ -63,15 +63,31 @@ in
   home.file.".claude/settings.json".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.claude/settings.json";
 
-  # Keep Pi's credential and runtime state local by linking only authored files.
-  home.file.".pi/agent/themes/rose-pine-moon.json".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/themes/rose-pine-moon.json";
+  # Keep Pi's credential and runtime state local by linking only authored files and directories.
+  home.file.".pi/agent/themes".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/themes";
+  home.file.".pi/agent/extensions".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/extensions";
   home.file.".pi/agent/models.json".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/models.json";
   home.file.".pi/agent/settings.json".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/settings.json";
-  home.file.".pi/agent/extensions/terminal-status-title.js".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/extensions/terminal-status-title.js";
+
+  # Remove only the two legacy managed child links before Home Manager adopts their directories.
+  home.activation.migratePiAuthoredDirectories = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+    removeLegacyPiLink() {
+      local target="$1"
+      local source="$2"
+      if [ -L "$target" ] && [ "$(readlink "$target")" = "$source" ]; then
+        $DRY_RUN_CMD rm "$target"
+      fi
+    }
+
+    removeLegacyPiLink "$HOME/.pi/agent/themes/rose-pine-moon.json" "${dotfiles}/home/.pi/agent/themes/rose-pine-moon.json"
+    removeLegacyPiLink "$HOME/.pi/agent/extensions/terminal-status-title.js" "${dotfiles}/home/.pi/agent/extensions/terminal-status-title.js"
+    $DRY_RUN_CMD rmdir "$HOME/.pi/agent/themes" 2>/dev/null || true
+    $DRY_RUN_CMD rmdir "$HOME/.pi/agent/extensions" 2>/dev/null || true
+  '';
 
   home.file.".claude/CLAUDE.md".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
