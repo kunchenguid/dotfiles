@@ -126,7 +126,7 @@ export default function terminalStatusTitle(pi) {
     setStatus("working", ctx);
   });
 
-  pi.on("agent_end", async (_event, ctx) => {
+  pi.on("agent_settled", async (_event, ctx) => {
     setStatus("done", ctx);
   });
 
