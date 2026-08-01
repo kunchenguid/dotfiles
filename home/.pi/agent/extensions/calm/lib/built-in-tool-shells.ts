@@ -34,6 +34,10 @@ type ToolRowPresentationState = {
   imageSpacers: Component[];
 };
 
+type AgentSessionPresentationState = {
+  _baseToolsOverride?: Record<string, unknown>;
+};
+
 type CalmBuiltInToolShellPatch = {
   hidesShell: () => boolean;
   builtInDefinitions: WeakSet<ToolDefinition>;
@@ -77,8 +81,14 @@ export function installCalmBuiltInToolShellLayout(): void {
   ): ToolDefinition | undefined {
     const definition = originalGetToolDefinition.call(this, name);
     const source = this.getAllTools().find((tool) => tool.name === name)?.sourceInfo.source;
-    if (definition && source === "builtin") {
-      patch.builtInDefinitions.add(definition);
+    if (definition) {
+      const session = this as unknown as AgentSessionPresentationState;
+      const isSdkBaseOverride = Object.hasOwn(session._baseToolsOverride ?? {}, name);
+      if (source === "builtin" && !isSdkBaseOverride) {
+        patch.builtInDefinitions.add(definition);
+      } else {
+        patch.builtInDefinitions.delete(definition);
+      }
     }
     return definition;
   };

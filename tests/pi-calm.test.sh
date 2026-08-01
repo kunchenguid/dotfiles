@@ -433,6 +433,14 @@ check(customSession.getToolDefinition("read") === collidingCustom, "custom colli
 const collidingRow = new ToolExecutionComponent("read", "custom-read-call", {}, { showImages: false }, collidingCustom, renderUi, process.cwd());
 collidingRow.markExecutionStarted(); collidingRow.setArgsComplete(); collidingRow.updateResult({ content: [{ type: "text", text: "CUSTOM_RESULT" }], details: {}, isError: false });
 check(collidingRow.render(100).join("\\n").includes("CUSTOM_CALL"), "Calm hid a built-in-named custom tool");
+const baseOverrideCustom = { ...custom, name: "bash" };
+const baseOverrideSession = Object.create(AgentSession.prototype);
+baseOverrideSession._baseToolsOverride = { bash: baseOverrideCustom };
+baseOverrideSession._toolDefinitions = new Map([["bash", { definition: baseOverrideCustom, sourceInfo: { source: "builtin" } }]]);
+check(baseOverrideSession.getToolDefinition("bash") === baseOverrideCustom, "SDK base override lookup changed identity");
+const baseOverrideRow = new ToolExecutionComponent("bash", "sdk-bash-call", {}, { showImages: false }, baseOverrideCustom, renderUi, process.cwd());
+baseOverrideRow.markExecutionStarted(); baseOverrideRow.setArgsComplete(); baseOverrideRow.updateResult({ content: [{ type: "text", text: "CUSTOM_RESULT" }], details: {}, isError: false });
+check(baseOverrideRow.render(100).join("\\n").includes("CUSTOM_CALL"), "Calm hid an SDK base-tool override");
 const session = [{ type: "message", message: { role: "user", content: "REAL_USER_PROMPT" } }, { type: "message", message: { role: "assistant", content: "VISIBLE_ASSISTANT_TEXT" } }];
 const before = JSON.stringify(session);
 check(JSON.stringify(session) === before, "presentation test changed session data");
