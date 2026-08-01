@@ -351,7 +351,7 @@ import { pathToFileURL } from "node:url";
 
 process.env.PI_CODING_AGENT_DIR = process.env.AGENT_DIR;
 const root = process.env.PI_PACKAGE_DIR;
-const [{ AssistantMessageComponent, ToolExecutionComponent }, { initTheme }, { Text }] = await Promise.all([
+const [{ AgentSession, AssistantMessageComponent, ToolExecutionComponent, createBashToolDefinition, createEditToolDefinition, createFindToolDefinition, createGrepToolDefinition, createLsToolDefinition, createReadToolDefinition, createWriteToolDefinition }, { initTheme }, { Text }] = await Promise.all([
   import("@earendil-works/pi-coding-agent"),
   import(pathToFileURL(`${root}/dist/modes/interactive/theme/theme.js`).href),
   import("@earendil-works/pi-tui"),
@@ -400,8 +400,14 @@ check(assistant.render(100).join("\\n").includes("PRIVATE_REASONING"), "expandin
 assistant.setHideThinkingBlock(true);
 
 const renderUi = { requestRender() {} };
-for (const toolName of ["read", "bash", "edit", "write", "grep", "find", "ls"]) {
-  const row = new ToolExecutionComponent(toolName, `call-${toolName}`, {}, { showImages: false }, undefined, renderUi, process.cwd());
+const builtInFactories = [createReadToolDefinition, createBashToolDefinition, createEditToolDefinition, createWriteToolDefinition, createGrepToolDefinition, createFindToolDefinition, createLsToolDefinition];
+for (const factory of builtInFactories) {
+  const definition = factory(process.cwd());
+  const toolName = definition.name;
+  const session = Object.create(AgentSession.prototype);
+  session._toolDefinitions = new Map([[toolName, { definition, sourceInfo: { source: "builtin" } }]]);
+  check(session.getToolDefinition(toolName) === definition, `${toolName} definition lookup changed identity`);
+  const row = new ToolExecutionComponent(toolName, `call-${toolName}`, {}, { showImages: false }, definition, renderUi, process.cwd());
   row.markExecutionStarted();
   row.setArgsComplete();
   row.updateResult({ content: [{ type: "text", text: `RESULT_${toolName}` }], details: {}, isError: false });
@@ -420,6 +426,13 @@ const custom = {
 const customRow = new ToolExecutionComponent("custom_boundary", "custom-call", {}, { showImages: false }, custom, renderUi, process.cwd());
 customRow.markExecutionStarted(); customRow.setArgsComplete(); customRow.updateResult({ content: [{ type: "text", text: "CUSTOM_RESULT" }], details: {}, isError: false });
 check(customRow.render(100).join("\\n").includes("CUSTOM_CALL"), "Calm hid a generic custom tool");
+const collidingCustom = { ...custom, name: "read" };
+const customSession = Object.create(AgentSession.prototype);
+customSession._toolDefinitions = new Map([["read", { definition: collidingCustom, sourceInfo: { source: "sdk" } }]]);
+check(customSession.getToolDefinition("read") === collidingCustom, "custom collision definition lookup changed identity");
+const collidingRow = new ToolExecutionComponent("read", "custom-read-call", {}, { showImages: false }, collidingCustom, renderUi, process.cwd());
+collidingRow.markExecutionStarted(); collidingRow.setArgsComplete(); collidingRow.updateResult({ content: [{ type: "text", text: "CUSTOM_RESULT" }], details: {}, isError: false });
+check(collidingRow.render(100).join("\\n").includes("CUSTOM_CALL"), "Calm hid a built-in-named custom tool");
 const session = [{ type: "message", message: { role: "user", content: "REAL_USER_PROMPT" } }, { type: "message", message: { role: "assistant", content: "VISIBLE_ASSISTANT_TEXT" } }];
 const before = JSON.stringify(session);
 check(JSON.stringify(session) === before, "presentation test changed session data");

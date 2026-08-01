@@ -3,12 +3,17 @@
 // Adapted from the Firstmate project's Calm implementation.
 // Copyright (c) 2026 Kun Chen. MIT License - see the LICENSE file in this directory.
 //
-// Verified against Pi 0.82.0, which exports ToolExecutionComponent. This
-// adapter changes only the final TUI row layout. Active tool definitions,
-// execution, settings, SDK overrides, extension collisions, and stored results
-// remain owned by Pi. Image results remain visible without their call/result
-// shell, and tools outside Pi's seven known built-in names render unchanged.
-import { ToolExecutionComponent } from "@earendil-works/pi-coding-agent";
+// Verified against Pi 0.82.0, which exports AgentSession and
+// ToolExecutionComponent. The source-aware lookup returns Pi's active definition
+// unchanged and the adapter changes only its final TUI row layout. Execution,
+// settings, SDK overrides, extension collisions, and stored results remain
+// owned by Pi. Image results remain visible without their call/result shell,
+// and custom tools or tools outside Pi's seven built-ins render unchanged.
+import {
+  AgentSession,
+  ToolExecutionComponent,
+  type ToolDefinition,
+} from "@earendil-works/pi-coding-agent";
 import type { Component } from "@earendil-works/pi-tui";
 import { calmHidesTranscriptChrome } from "./visibility.ts";
 
@@ -24,13 +29,14 @@ const CALM_BUILT_IN_TOOL_NAMES = new Set([
 
 type ToolRowPresentationState = {
   toolName: string;
-  builtInToolDefinition?: object;
+  toolDefinition?: ToolDefinition;
   imageComponents: Component[];
   imageSpacers: Component[];
 };
 
 type CalmBuiltInToolShellPatch = {
   hidesShell: () => boolean;
+  builtInDefinitions: WeakSet<ToolDefinition>;
 };
 
 const CALM_BUILT_IN_TOOL_SHELL_PATCH = Symbol.for(
@@ -43,11 +49,15 @@ export function installCalmBuiltInToolShellLayout(): void {
   };
   const hidesShell = (): boolean => calmHidesTranscriptChrome();
   const installed = registry[CALM_BUILT_IN_TOOL_SHELL_PATCH];
-  if (installed) {
+  if (installed?.builtInDefinitions) {
     installed.hidesShell = hidesShell;
     return;
   }
 
+  const originalGetToolDefinition = AgentSession.prototype.getToolDefinition;
+  if (typeof originalGetToolDefinition !== "function") {
+    throw new Error("Pi Calm requires Pi AgentSession.getToolDefinition");
+  }
   if (typeof ToolExecutionComponent !== "function") {
     throw new Error("Pi Calm requires Pi ToolExecutionComponent");
   }
@@ -56,12 +66,29 @@ export function installCalmBuiltInToolShellLayout(): void {
     throw new Error("Pi Calm requires Pi ToolExecutionComponent.render");
   }
 
-  const patch: CalmBuiltInToolShellPatch = { hidesShell };
+  if (installed) installed.hidesShell = () => false;
+
+  const patch: CalmBuiltInToolShellPatch = {
+    hidesShell,
+    builtInDefinitions: new WeakSet(),
+  };
+  AgentSession.prototype.getToolDefinition = function (
+    name: string,
+  ): ToolDefinition | undefined {
+    const definition = originalGetToolDefinition.call(this, name);
+    const source = this.getAllTools().find((tool) => tool.name === name)?.sourceInfo.source;
+    if (definition && source === "builtin") {
+      patch.builtInDefinitions.add(definition);
+    }
+    return definition;
+  };
+
   ToolExecutionComponent.prototype.render = function (width: number): string[] {
     const state = this as unknown as ToolRowPresentationState;
     const isKnownBuiltIn =
       CALM_BUILT_IN_TOOL_NAMES.has(state.toolName) &&
-      state.builtInToolDefinition !== undefined;
+      state.toolDefinition !== undefined &&
+      patch.builtInDefinitions.has(state.toolDefinition);
     if (!isKnownBuiltIn || !patch.hidesShell()) {
       return originalRender.call(this, width);
     }
