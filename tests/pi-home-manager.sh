@@ -56,26 +56,28 @@ probe=$(mktemp -d)
 trap 'rm -rf "$probe"' EXIT
 fake_home="$probe/home"
 mkdir -p "$fake_home/.pi/agent/themes" "$fake_home/.pi/agent/extensions"
-home_manager_files=$(readlink -f "$activation/home-files")
-ln -s "$home_manager_files/.pi/agent/themes/rose-pine-moon.json" \
+legacy_tree="$probe/home-manager-files"
+mkdir -p "$legacy_tree/.pi/agent/themes" "$legacy_tree/.pi/agent/extensions"
+ln -s "$repo_root/home/.pi/agent/themes/rose-pine-moon.json" \
+  "$legacy_tree/.pi/agent/themes/rose-pine-moon.json"
+ln -s "$repo_root/home/.pi/agent/extensions/terminal-status-title.js" \
+  "$legacy_tree/.pi/agent/extensions/terminal-status-title.js"
+legacy_home_manager_files=$(nix store add-path "$legacy_tree")
+ln -s "$legacy_home_manager_files/.pi/agent/themes/rose-pine-moon.json" \
   "$fake_home/.pi/agent/themes/rose-pine-moon.json"
-ln -s "$home_manager_files/.pi/agent/extensions/terminal-status-title.js" \
+ln -s "$legacy_home_manager_files/.pi/agent/extensions/terminal-status-title.js" \
   "$fake_home/.pi/agent/extensions/terminal-status-title.js"
 
-test "$(readlink "$fake_home/.pi/agent/themes/rose-pine-moon.json")" != \
-  /Users/kunchen/.dotfiles/home/.pi/agent/themes/rose-pine-moon.json
-expected_theme_source=$(readlink -f \
-  /Users/kunchen/.dotfiles/home/.pi/agent/themes/rose-pine-moon.json)
-test -n "$expected_theme_source"
 test "$(readlink -f "$fake_home/.pi/agent/themes/rose-pine-moon.json")" = \
-  "$expected_theme_source"
+  "$repo_root/home/.pi/agent/themes/rose-pine-moon.json"
 
 # Execute only the generated pre-check migration block against a disposable HOME.
 awk '
   /_iNote "Activating %s" "migratePiAuthoredDirectories"/ { enabled = 1; next }
   /_iNote "Activating %s" "checkLinkTargets"/ { exit }
   enabled { print }
-' "$activation/activate" > "$probe/migrate.sh"
+' "$activation/activate" | \
+  sed "s|/Users/kunchen/.dotfiles|$repo_root|g" > "$probe/migrate.sh"
 HOME="$fake_home" DRY_RUN_CMD='' bash -e "$probe/migrate.sh"
 
 test ! -e "$fake_home/.pi/agent/themes"
@@ -84,5 +86,14 @@ ln -s "$repo_root/home/.pi/agent/themes" "$fake_home/.pi/agent/themes"
 ln -s "$repo_root/home/.pi/agent/extensions" "$fake_home/.pi/agent/extensions"
 test -L "$fake_home/.pi/agent/themes"
 test -L "$fake_home/.pi/agent/extensions"
+
+# Safe skip paths must succeed and leave unrelated user state untouched.
+mkdir -p "$probe/unmanaged/.pi/agent/themes" "$probe/unmanaged/.pi/agent/extensions"
+touch "$probe/unmanaged/.pi/agent/themes/user-theme.json"
+ln -s "$repo_root/home/.pi/agent/extensions/terminal-status-title.js" \
+  "$probe/unmanaged/.pi/agent/extensions/user-extension.js"
+HOME="$probe/unmanaged" DRY_RUN_CMD='' bash -e "$probe/migrate.sh"
+test -f "$probe/unmanaged/.pi/agent/themes/user-theme.json"
+test -L "$probe/unmanaged/.pi/agent/extensions/user-extension.js"
 
 echo "Pi package declarations, runtime boundary, link shape, and child-to-parent migration passed."

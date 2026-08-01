@@ -81,13 +81,13 @@ in
       local relativeTarget="''${target#"$HOME/"}"
       local linkTarget
 
-      [ -L "$target" ] || return
+      [ -L "$target" ] || return 0
       linkTarget="$(readlink "$target")"
       case "$linkTarget" in
         /nix/store/*-home-manager-files/"$relativeTarget") ;;
-        *) return ;;
+        *) return 0 ;;
       esac
-      [ "$(readlink -f "$target")" = "$(readlink -f "$source")" ] || return
+      [ "$(readlink -f "$target")" = "$(readlink -f "$source")" ] || return 0
       $DRY_RUN_CMD rm "$target"
     }
 
