@@ -28,6 +28,7 @@ let
     "herdr"
     "thefuck"
     "skills"
+    "btop"
   ];
   # CLI tools for this personal Mac only.
   personalBrews = [
