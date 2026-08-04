@@ -40,6 +40,8 @@ in
       m = "git switch main";
       cc = "claude --dangerously-skip-permissions";
       co = "codex --full-auto";
+      server = "python3 -m http.server 8080";
+      qwen = "llama-server -hf unsloth/Qwen3.6-27B-MTP-GGUF:Q8_0 --spec-type draft-mtp -ngl 999 -fa on -c 65536 --jinja --port 8080";
     };
   };
 
@@ -82,4 +84,8 @@ in
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
   home.file.".config/opencode/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
+
+  # VSCode
+  home.file."Library/Application Support/Code/User/settings.json".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.vscode/settings.json";
 }

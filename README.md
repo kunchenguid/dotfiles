@@ -5,6 +5,10 @@ Watch the walkthrough: https://youtu.be/5N-okeDdIuI
 My personal Mac setup, managed with nix-darwin and home-manager.
 One repo, one command, and a fresh Mac ends up configured the same way every time.
 
+nix-darwin manages macOS level packages. home-manager manages home folder settings.
+
+> This is a fork of https://github.com/kunchenguid/dotfiles to add my own tooling around vscode, language servers, local models, and other development needs.
+
 ## Contributing / Using This Repo
 
 These are my personal dotfiles, shared publicly so people can read them, learn from them, and fork them freely.

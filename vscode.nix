@@ -1,7 +1,5 @@
 # VSCode plus its extensions, installed from nixpkgs like every other package.
 # Kept in its own file so editor/extension changes are easy to find and edit.
-# All three extensions come from nixpkgs' `vscode-extensions` set, so there is
-# no extra flake input to keep in sync. Add more by name below.
 { pkgs, ... }:
 
 {

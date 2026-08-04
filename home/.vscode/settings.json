@@ -1,0 +1,30 @@
+{
+    "go.toolsManagement.autoUpdate": true,
+    "go.testTags": "",
+    "go.testOnSave": true,
+    "go.testFlags": ["-v"],
+    "go.formatTool": "goimports",
+    "go.lintTool": "golint",
+    "go.lintFlags": [],
+    "go.useLanguageServer": true,
+    "go.languageServerFlags": ["-rpc.trace"],
+    "[go]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports":"explicit",
+            "source.fixAll":"explicit"
+        }
+    },
+    "editor.rulers": [80, 120],
+    "workbench.settings.applyToAllProfiles": [],
+    "claudeCode.preferredLocation": "panel",
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 80,
+    "[html]": {
+        "editor.wordWrapColumn": 80
+    },
+    "settingsSync.ignoredSettings": [
+        
+    ],
+    "[c]": {}
+}
