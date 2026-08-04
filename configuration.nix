@@ -36,10 +36,14 @@
     onActivation.extraFlags = [ "--force" ];
     brews = [
       "herdr"
+      "ncdu" # disk space usage cli tool
+      "cloc" # lines of code and other metadata for a folder
+      "llama.cpp" # run local models like qwen
     ];
     casks = [
-      "wezterm"
+      "wezterm" # replaces zsh as our terminal of choice
       "claude-code"
+      "sublime-text" # default text editor
     ];
   };
 }

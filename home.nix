@@ -5,6 +5,8 @@ let
 in
 
 {
+  imports = [ ./vscode.nix ];
+
   home.username = user;
   home.homeDirectory = "/Users/${user}";
   home.stateVersion = "24.11";
@@ -16,6 +18,7 @@ in
     jq        # json on the command line
     lazygit
     neovim
+    # vscode + its extensions live in ./vscode.nix
     # the font everything renders in
     nerd-fonts.hack
   ];
