@@ -35,15 +35,24 @@
     onActivation.autoUpdate = true;
     onActivation.extraFlags = [ "--force" ];
     brews = [
-      "herdr"
-      "ncdu" # disk space usage cli tool
-      "cloc" # lines of code and other metadata for a folder
-      "llama.cpp" # run local models like qwen
+      "herdr"           # tmux for agents
+      "gh"              # GitHub CLI
+      "ca-certificates" # required for node
+      "node"
+      "go"
+
+      # Common shell / systems tools
+      "wget"
+      "curl"
+      "cloc" # lines of code and other metadata for a repo
+      "ncdu" # disk space usage cli scanner
+      "jq"   # json parsing
     ];
     casks = [
       "wezterm" # replaces zsh as our terminal of choice
       "claude-code"
       "sublime-text" # default text editor
+      "rectangle"    # window management
     ];
   };
 }
