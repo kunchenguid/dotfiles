@@ -51,6 +51,7 @@
     casks = [
       "wezterm" # replaces zsh as our terminal of choice
       "claude-code"
+      "lm-studio"    # run local models
       "sublime-text" # default text editor
       "rectangle"    # window management
     ];
