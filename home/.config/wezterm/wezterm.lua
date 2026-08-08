@@ -44,4 +44,55 @@ wezterm.on("window-focus-changed", function(window)
 	window:set_config_overrides(overrides)
 end)
 
+-- Function to get memory usage based on OS
+local function get_memory_usage()
+  local cmd = ""
+  
+  if wezterm.target_triple:find("apple") then
+    -- macOS command
+    cmd = [[
+    vm_stat | awk '
+    /Pages free/ {free=$3}
+    /Pages active/ {a=$3}
+    /Pages inactive/ {i=$3}
+    /Pages speculative/ {s=$3}
+    /Pages wired down/ {w=$3}
+    END {
+      used=a+i+s+w;
+      total=used+free;
+      if (total==0) { print "N/A"; exit 1 }
+      printf "%.1f%%", (used/total)*100
+    }'
+  ]]
+  elseif wezterm.target_triple:find("windows") then
+    -- Windows PowerShell command
+    cmd = "powershell -NoProfile -Command \"(Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory\""
+  else
+    -- Linux command
+    cmd = "free -h | awk '/^Mem:/ {print $3 \"/\" $2}'"
+  end
+
+  local success, stdout, stderr = wezterm.run_child_process({ "sh", "-c", cmd })
+  
+  -- Fallback for Windows if sh isn't available natively
+  if not success and wezterm.target_triple:find("windows") then
+    success, stdout, stderr = wezterm.run_child_process({ "powershell.exe", "-NoProfile", "-Command", cmd })
+  end
+
+  if success then
+    return stdout:gsub("%s+", "") -- Clean up whitespace/newlines
+  end
+  return "Mem: Unknown"
+end
+
+wezterm.on('update-status', function(window, pane)
+  local mem = get_memory_usage()
+  
+  window:set_right_status(wezterm.format({
+    { Background = { Color = '#1e1e2e' } },
+    { Foreground = { Color = '#fab387' } },
+    { Text = ' Mem: ' .. mem .. ' ' },
+  }))
+end)
+
 return config

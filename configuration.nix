@@ -17,7 +17,7 @@
       AppleInterfaceStyle = "Dark";
       KeyRepeat = 2;          # fast key repeat
       InitialKeyRepeat = 15;  # short delay before repeat
-      _HIHideMenuBar = true;  # auto-hide the menu bar
+      # _HIHideMenuBar = true;  # auto-hide the top menu
       AppleShowAllExtensions = true;
     };
     dock.autohide = true;
@@ -54,6 +54,8 @@
       "lm-studio"    # run local models
       "sublime-text" # default text editor
       "rectangle"    # window management
+      "handy"        # local speech-to-text using Whisper or Parakeet models
+      "stats"        # CPU / Memory / swap usage while runing local models
     ];
   };
 }
