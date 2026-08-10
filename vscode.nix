@@ -9,9 +9,9 @@
         golang.go                 # Go language support
         rust-lang.rust-analyzer   # Rust language server
         ms-python.vscode-pylance  # Python language server (unfree)
-        saoudrizwan.claude-dev # Cline for local agents
+        saoudrizwan.claude-dev    # Cline for local agents
         shd101wyy.markdown-preview-enhanced
-        jnoortheen.nix-ide # nix language server
+        jnoortheen.nix-ide        # nix language server
       ];
     })
   ];

@@ -1,4 +1,4 @@
-{ config, pkgs, user, ... }:
+{ config, pkgs, user, treehouse, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/.dotfiles";
@@ -21,6 +21,8 @@ in
     # vscode + its extensions live in ./vscode.nix
     # the font everything renders in
     nerd-fonts.hack
+    # treehouse install
+    treehouse.packages.${pkgs.system}.default
   ];
   fonts.fontconfig.enable = true;
   home.sessionVariables.EDITOR = "nvim";
@@ -41,7 +43,9 @@ in
       cc = "claude --dangerously-skip-permissions";
       co = "codex --full-auto";
       server = "python3 -m http.server 8080";
-      qwen = "llama-server -hf unsloth/Qwen3.6-27B-MTP-GGUF:Q8_0 --spec-type draft-mtp -ngl 999 -fa on -c 65536 --jinja --port 8080";
+      # run models all night / clamshell without letting the computer sleep
+      preventsleep = "sudo pmset -b sleep 0; sudo pmset -b disablesleep 1";
+      enablesleep = "sudo pmset -b sleep 30; sudo pmset -b disablesleep 0";
     };
   };
 
