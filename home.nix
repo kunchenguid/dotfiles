@@ -1,4 +1,4 @@
-{ config, pkgs, user, treehouse, ... }:
+{ config, pkgs, user, treehouse, lib, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/.dotfiles";
@@ -92,4 +92,42 @@ in
   # VSCode
   home.file."Library/Application Support/Code/User/settings.json".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.vscode/settings.json";
+
+
+  # we're using nix to install homebrew, then homebrew to install nodejs/npm so
+  # that we can keep it updated easier than relying on the nix packages.
+  # However, that means we must install the packages ourselves and homebrew 
+  # doesn't have packages for all of them (neither does nix actually) so...
+  # ...here we are with a hacky post-install script.
+  home.activation.installNpmPackages = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    BREW_BIN="/opt/homebrew/bin"
+    NODE_PATH="$BREW_BIN/node"
+    NPM_PATH="$BREW_BIN/npm"
+    NPX_PATH="$BREW_BIN/npx"
+
+    if [ -x "$NPM_PATH" ]; then
+      export PATH="$BREW_BIN:$PATH"
+
+      # export NPM_CONFIG_PREFIX="${config.home.homeDirectory}/.npm-global"
+      # mkdir -p "$NPM_CONFIG_PREFIX"
+
+      echo "Installing global npm packages via Homebrew Node..."
+      $DRY_RUN_CMD "$NPM_PATH" install -g skills gh-axi chrome-devtools-axi gnhf
+    else
+      echo "Warning: Homebrew npm not found at $NPM_PATH yet. Skipping."
+    fi
+
+    if [ -x "$NPX_PATH" ]; then
+      export PATH="$BREW_BIN:$PATH"
+      $DRY_RUN_CMD "$NPX_PATH" skills add kunchenguid/lavish-axi --skill lavish
+
+      # report installed skills
+      "$NPX_PATH" skills list -g
+    else
+      echo "Warning: Homebrew npx not found at $NPX_PATH yet. Skipping."
+    fi
+
+    # also install the no-mistakes binary
+    $DRY_RUN_CMD go install github.com/kunchenguid/no-mistakes/cmd/no-mistakes@latest
+  '';
 }
