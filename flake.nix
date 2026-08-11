@@ -24,8 +24,10 @@
       # only needs to be changed here.
       hostLabel = "mac";
       # true installs this Mac's personal brews and GUI casks (Slack,
-      # Discord, Spotify, Notion, Figma) alongside the shared dev tooling;
-      # false installs dev tooling only (e.g. for a server).
+      # Discord, Spotify, Notion, Figma) alongside the shared dev tooling,
+      # and selects the full TeX Live scheme (all packages/engines);
+      # false installs dev tooling only (e.g. for a server), with the
+      # minimal TeX Live scheme (just pdflatex/xelatex).
       usePersonalSetup = true;
     in
     {
@@ -39,7 +41,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "before-home-manager";
-            home-manager.extraSpecialArgs = { inherit user; };
+            home-manager.extraSpecialArgs = { inherit user usePersonalSetup; };
             home-manager.users.${user} = import ./home.nix;
           }
         ];
