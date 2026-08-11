@@ -27,9 +27,10 @@
     "type": "command",
     "command": "input=$(cat); model=$(echo \"$input\" | jq -r '.model.display_name'); used=$(echo \"$input\" | jq -r '.context_window.used_percentage // empty'); if [ -n \"$used\" ]; then printf \"%s | ctx: %.0f%% used\" \"$model\" \"$used\"; else printf \"%s\" \"$model\"; fi"
   },
-  "theme": "dark-ansi",
   "enabledPlugins": {
-    "skill-codex@skill-codex": true
+    "skill-codex@skill-codex": true,
+    "ponytail@ponytail": true,
+    "caveman@caveman": true
   },
   "extraKnownMarketplaces": {
     "skill-codex": {
@@ -37,7 +38,20 @@
         "source": "github",
         "repo": "skills-directory/skill-codex"
       }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    },
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
     }
   },
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark-ansi"
 }
