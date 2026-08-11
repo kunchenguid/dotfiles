@@ -43,7 +43,17 @@ else
   echo "    flake.nix already matches \"$REAL_USER\", nothing to do."
 fi
 
-echo "==> Step 4: first darwin-rebuild switch (pinned to nix-darwin-26.05)"
+echo "==> Step 4: trust this repo for root"
+# darwin-rebuild always runs via sudo, so root evaluates this flake's
+# git+file:// input. libgit2 refuses to open a repo owned by a different
+# user unless it's allow-listed - add it once, idempotently.
+# -f /etc/gitconfig, not --system: --system resolves per-git-binary and can
+# land in a nix store path a wrapped git considers "system", not the fixed
+# path Nix's own libgit2 fetcher reads.
+sudo git config -f /etc/gitconfig --get-all safe.directory 2>/dev/null | grep -qx "$DIR" \
+  || sudo git config -f /etc/gitconfig --add safe.directory "$DIR"
+
+echo "==> Step 5: first darwin-rebuild switch (pinned to nix-darwin-26.05)"
 # darwin-rebuild doesn't exist yet on a fresh machine, so run it straight
 # from the flake this once. After this, rebuild.sh works normally.
 # This fetches the darwin-rebuild tool from the nix-darwin-26.05 release branch,
