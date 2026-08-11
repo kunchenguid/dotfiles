@@ -8,6 +8,9 @@ if [ -z "$HOST_LABEL" ]; then
   echo "Edit flake.nix yourself before continuing." >&2
   exit 1
 fi
-sudo git config --system --get-all safe.directory 2>/dev/null | grep -qx "$DIR" \
-  || sudo git config --system --add safe.directory "$DIR"
+# -f /etc/gitconfig, not --system: --system resolves per-git-binary and can
+# land in a nix store path a wrapped git considers "system", not the fixed
+# path Nix's own libgit2 fetcher reads.
+sudo git config -f /etc/gitconfig --get-all safe.directory 2>/dev/null | grep -qx "$DIR" \
+  || sudo git config -f /etc/gitconfig --add safe.directory "$DIR"
 exec sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ~/.dotfiles#"$HOST_LABEL"
