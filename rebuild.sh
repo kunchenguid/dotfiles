@@ -8,4 +8,6 @@ if [ -z "$HOST_LABEL" ]; then
   echo "Edit flake.nix yourself before continuing." >&2
   exit 1
 fi
+sudo git config --system --get-all safe.directory 2>/dev/null | grep -qx "$DIR" \
+  || sudo git config --system --add safe.directory "$DIR"
 exec sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ~/.dotfiles#"$HOST_LABEL"
