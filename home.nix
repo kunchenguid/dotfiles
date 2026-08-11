@@ -1,4 +1,4 @@
-{ config, pkgs, user, ... }:
+{ config, pkgs, user, usePersonalSetup, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/.dotfiles";
@@ -20,6 +20,10 @@ in
     tree-sitter
     # the font everything renders in
     nerd-fonts.hack
+    # LaTeX: full scheme (all packages/engines) on personal machines to match
+    # what MacTeX used to provide; minimal scheme (just pdflatex/xelatex) on
+    # non-personal machines (e.g. a server).
+    (if usePersonalSetup then texlive.combined.scheme-full else texlive.combined.scheme-basic)
   ];
   fonts.fontconfig.enable = true;
   home.sessionVariables.EDITOR = "nvim";
