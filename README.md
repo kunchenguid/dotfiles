@@ -52,7 +52,7 @@ Change the host label or CPU architecture if needed, and read the Homebrew clean
 2. Symlinks this repo to `~/.dotfiles`.
    This has to happen before the first build, because `home.nix` points at config files through `~/.dotfiles`.
 3. Checks the `user` configured in `flake.nix` against your actual macOS username, and offers to fix it for you if they differ.
-4. Trusts this repo for root, via `git config --system --add safe.directory`.
+4. Trusts this repo for root, via `git config -f /etc/gitconfig --add safe.directory`.
    `darwin-rebuild` always runs via `sudo`, so root evaluates this flake's `git+file://` input; without this, libgit2 refuses to open a repo owned by another user.
 5. Runs the first `darwin-rebuild switch`.
    It fetches the `darwin-rebuild` tool from the nix-darwin 26.05 release branch, then applies this repo's locked flake config.
