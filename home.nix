@@ -51,6 +51,11 @@ in
     };
   };
 
+  programs.zoxide = {
+    enable = true;
+    options = [ "--cmd" "cd" ];
+  };
+
   programs.git = {
     enable = true;
     settings.user = {
