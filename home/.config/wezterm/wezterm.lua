@@ -11,4 +11,13 @@ config.native_macos_fullscreen_mode = true -- this means you lose the pretty opa
 config.hide_tab_bar_if_only_one_tab = true
 config.window_decorations = "RESIZE"
 
+config.colors = {
+  selection_bg = "#ea9a97",
+  selection_fg = "#232136",
+  copy_mode_active_highlight_bg = { Color = "#ea9a97" },
+  copy_mode_active_highlight_fg = { Color = "#232136" },
+  copy_mode_inactive_highlight_bg = { Color = "#3e8fb0" },
+  copy_mode_inactive_highlight_fg = { Color = "#e0def4" },
+}
+
 return config
