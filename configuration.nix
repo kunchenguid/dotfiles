@@ -70,8 +70,10 @@ in
   system.defaults = {
     NSGlobalDomain = {
       AppleInterfaceStyle = "Dark";
-      # KeyRepeat = 2;          # fast key repeat
-      # InitialKeyRepeat = 15;  # short delay before repeat
+      # 1=15ms, 2=30ms
+      KeyRepeat = 1;          # fast key repeat. lower is faster.
+      # 10=150ms, 15=225ms
+      InitialKeyRepeat = 10;  # short delay before repeat. lower is faster
       # _HIHideMenuBar = true;  # auto-hide the menu bar
       AppleShowAllExtensions = true;
     };
