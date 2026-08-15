@@ -20,8 +20,7 @@ config.colors = {
   copy_mode_inactive_highlight_fg = { Color = "#e0def4" },
 }
 
--- Match herdr's prefix (ctrl+b)
-config.leader = { key = "b", mods = "CTRL", timeout_milliseconds = 1000 }
+config.leader = { key = "Space", mods = "CTRL", timeout_milliseconds = 1000 }
 config.keys = {
   {
     key = "[",
@@ -30,9 +29,9 @@ config.keys = {
   },
   -- Send a real ctrl+b when you press prefix then ctrl+b again
   {
-    key = "b",
+    key = "Space",
     mods = "LEADER|CTRL",
-    action = wezterm.action.SendKey({ key = "b", mods = "CTRL" }),
+    action = wezterm.action.SendKey({ key = "Space", mods = "CTRL" }),
   },
 }
 
