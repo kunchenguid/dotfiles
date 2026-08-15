@@ -81,6 +81,15 @@ in
     # finder.FXPreferredViewStyle = "Nlsv";  # list view by default
     # finder.CreateDesktop = false;          # clean desktop
     # trackpad.Clicking = true;              # tap to click
+    CustomUserPreferences = {
+      "com.apple.symbolichotkeys" = {
+        AppleSymbolicHotKeys = {
+          # Free up ctrl+space for wezterm's leader key (was "Select the
+          # previous input source").
+          "60" = { enabled = false; };
+        };
+      };
+    };
   };
   nix-homebrew = {
     enable = true;
