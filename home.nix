@@ -48,6 +48,21 @@ in
       gitverify = "ssh-add /Users/${user}/.ssh/id_rsa";
       disablesleep = "sudo pmset -a disablesleep 1";
       enablesleep = "sudo pmset -a disablesleep 0";
+
+      # One-shot, no tools
+      askclaude = ''claude -p --tools ""'';
+      askpi = "pi --no-context-files --exclude-tools read,write,edit,bash -p";
+      askcodex = "codex exec --ephemeral --sandbox read-only --ask-for-approval never";
+
+      # One-shot, full agent/tool access
+      doclaude = "claude -p";
+      dopi = "pi -p";
+      docodex = "codex exec";
+
+      # Interactive chat, no tools
+      chatclaude = ''claude --tools ""'';
+      chatpi = "pi --no-context-files --exclude-tools read,write,edit,bash";
+      chatcodex = "codex --sandbox read-only --ask-for-approval never";
     };
   };
 
