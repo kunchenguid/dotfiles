@@ -54,7 +54,7 @@ in
       # One-shot, no tools
       askclaude = ''claude -p --tools ""'';
       askpi = "pi --no-context-files --exclude-tools read,write,edit,bash -p";
-      askcodex = "codex exec --ephemeral --sandbox read-only --ask-for-approval never";
+      askcodex = "codex exec --ephemeral --sandbox read-only";
 
       # One-shot, full agent/tool access
       doclaude = "claude -p";
