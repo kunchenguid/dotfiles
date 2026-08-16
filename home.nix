@@ -37,6 +37,17 @@ in
     syntaxHighlighting.enable = true;  # commands turn green when valid
     initContent = ''
       bindkey '^f' autosuggest-accept
+
+      # WezTerm leader (Ctrl-Space) + g sends Ctrl-G into the terminal.
+      # Replace the current input line with an AI-generated one, no execution.
+      ai-fill-buffer() {
+        [[ -z $BUFFER ]] && return
+        local sys="Output ONLY the raw zsh command for macOS that accomplishes the task below. No explanation, no markdown, no code fences, no commentary - just the command, ready to run as-is."
+        BUFFER=$(claude -p --tools="" --append-system-prompt "$sys" "$BUFFER" 2>/dev/null | sed -e '/^```/d' -e '/^[[:space:]]*$/d')
+        CURSOR=$#BUFFER
+      }
+      zle -N ai-fill-buffer
+      bindkey '^G' ai-fill-buffer
     '';
     shellAliases = {
       ".." = "cd ..";

@@ -41,6 +41,8 @@ config.keys = {
   { key = "k", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Up") },
   { key = "j", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Down") },
   { key = "x", mods = "LEADER", action = wezterm.action.CloseCurrentPane({ confirm = true }) },
+  -- AI-fill the Zsh input buffer: sends Ctrl-G, bound in home.nix to ai-fill-buffer.
+  { key = "g", mods = "LEADER", action = wezterm.action.SendKey({ key = "g", mods = "CTRL" }) },
 }
 
 -- Dim unfocused windows so the focused one is obvious at a glance.
