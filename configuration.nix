@@ -30,6 +30,7 @@ let
     "skills"
     "btop"
     "pi-coding-agent"
+    "colima"
   ];
   # CLI tools for this personal Mac only.
   personalBrews = [
