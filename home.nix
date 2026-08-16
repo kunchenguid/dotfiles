@@ -52,7 +52,7 @@ in
       enablesleep = "sudo pmset -a disablesleep 0";
 
       # One-shot, no tools
-      askclaude = ''claude -p --tools ""'';
+      askclaude = ''claude -p --tools=""'';
       askpi = "pi --no-context-files --exclude-tools read,write,edit,bash -p";
       askcodex = "codex exec --ephemeral --sandbox read-only";
 
