@@ -33,6 +33,14 @@ config.keys = {
     mods = "LEADER|CTRL",
     action = wezterm.action.SendKey({ key = "Space", mods = "CTRL" }),
   },
+  -- tmux-style pane management, same keys, wezterm leader instead of ctrl+b
+  { key = "%", mods = "LEADER", action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+  { key = '"', mods = "LEADER", action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }) },
+  { key = "h", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Left") },
+  { key = "l", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Right") },
+  { key = "k", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Up") },
+  { key = "j", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Down") },
+  { key = "x", mods = "LEADER", action = wezterm.action.CloseCurrentPane({ confirm = true }) },
 }
 
 -- Dim unfocused windows so the focused one is obvious at a glance.
