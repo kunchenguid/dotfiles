@@ -29,6 +29,7 @@ let
     "thefuck"
     "skills"
     "btop"
+    "pi-coding-agent"
   ];
   # CLI tools for this personal Mac only.
   personalBrews = [
