@@ -53,5 +53,8 @@
     }
   },
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark-ansi"
+  "theme": "dark-ansi",
+  "viewMode": "focus",
+  "verbose": false,
+  "showThinkingSummaries": false
 }
