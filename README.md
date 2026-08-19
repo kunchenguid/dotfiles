@@ -176,7 +176,8 @@ One toggle controls both scopes: flip `usePersonalSetup` in `flake.nix` to `fals
 
 - `flake.nix` - the entry point.
   Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew, and declares the `hostLabel` machine; `usePersonalSetup` selects its brews/casks profile.
-- `configuration.nix` - system-level config: macOS defaults, Homebrew.
+- `configuration.nix` - system-level config: macOS defaults, Homebrew, and package selection logic (see "Package metadata" above).
+- `tools.nix` - the per-tool metadata table that `configuration.nix` selects packages from.
 - `home.nix` - user-level config: shell, packages, prompt, and the symlinks described below.
 - `rebuild.sh` - re-applies the config after the first switch.
   Run this every time you make a change.
