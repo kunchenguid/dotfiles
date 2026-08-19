@@ -17,15 +17,15 @@
   outputs = inputs@{ self, nix-darwin, nix-homebrew, home-manager, nixpkgs }:
     let
       # The one username line to change if this isn't your machine.
-      # bootstrap.sh offers to rewrite this for you if your macOS username differs.
+      # bootstrap.sh offers to rewrite this for you if your local username differs.
       user = "thomasharper";
       # The one host label to change if you want to rename the machine.
       # rebuild.sh and bootstrap.sh read this back out of flake.nix, so it
       # only needs to be changed here.
       hostLabel = "mac";
-      # true installs this Mac's personal brews and GUI casks (Slack,
+      # true installs personal brews and GUI casks on macOS (Slack,
       # Discord, Spotify, Notion, Figma) alongside the shared dev tooling,
-      # and selects the full TeX Live scheme (all packages/engines);
+      # and selects the full TeX Live scheme (all packages/engines) on every OS;
       # false installs dev tooling only (e.g. for a server), with the
       # minimal TeX Live scheme (just pdflatex/xelatex).
       usePersonalSetup = true;

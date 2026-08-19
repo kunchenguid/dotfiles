@@ -23,8 +23,7 @@
   { name = "wget"; scope = "basic"; platform = "all"; updatePolicy = "stable"; }
   { name = "cmake"; scope = "basic"; platform = "all"; updatePolicy = "stable"; }
 
-  # Stable CLI tooling only this personal Mac needs, but not OS-specific -
-  # would apply equally on a future personal Ubuntu machine.
+  # Stable CLI tooling only personal machines need, but not OS-specific.
   { name = "ffmpeg"; scope = "personal"; platform = "all"; updatePolicy = "stable"; }
   { name = "lcov"; scope = "personal"; platform = "all"; updatePolicy = "stable"; }
   # nixpkgs ships this under the "libusb1" attribute.
