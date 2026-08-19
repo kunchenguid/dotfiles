@@ -26,7 +26,6 @@ let
   # CLI tools wanted on every machine, personal or not.
   basicBrews = [
     "herdr"
-    "thefuck"
     "skills"
     "btop"
     "pi-coding-agent"
@@ -40,6 +39,7 @@ let
   ];
   # CLI tools for this personal Mac only.
   personalBrews = [
+    "thefuck"
     # Smart-contract toolchain
     "echidna"
     "solc-select"
