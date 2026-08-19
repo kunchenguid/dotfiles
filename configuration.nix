@@ -31,6 +31,7 @@ let
     "btop"
     "pi-coding-agent"
     "colima"
+    "mosh"
   ];
   # CLI tools for this personal Mac only.
   personalBrews = [
