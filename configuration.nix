@@ -1,62 +1,20 @@
-{ user, lib, usePersonalSetup, ... }:
+{ user, lib, pkgs, usePersonalSetup, ... }:
 
 let
-  # Dev tooling wanted on every machine, personal or not - reuse this list
-  # as-is on any future second machine (server or otherwise).
-  basicCasks = [
-    "wezterm"
-    "claude-code"
-    "codex"
-  ];
-  # GUI apps for this personal Mac only - leave these out of any other
-  # machine's cask list.
-  personalCasks = [
-    "opensuperwhisper"
-    "slack"
-    "discord"
-    "notion"
-    "figma"
-    "altair-graphql-client"
-    "mongodb-compass"
-    "todoist-app"
-    "anki"
-    "iterm2"
-    "zoom"
-  ];
-  # CLI tools wanted on every machine, personal or not.
-  basicBrews = [
-    "herdr"
-    "skills"
-    "btop"
-    "pi-coding-agent"
-    "colima"
-    "mosh"
-    "bzip2"
-    "gh"
-    "gnu-tar"
-    "tree"
-    "wget"
-  ];
-  # CLI tools for this personal Mac only.
-  personalBrews = [
-    "thefuck"
-    # Smart-contract toolchain
-    "echidna"
-    "solc-select"
-    "tenderly/tenderly/tenderly"
-    # Python / Postgres toolchain
-    "postgresql@15"
-    "libpq"
-    "pyenv"
-    # Everything else already installed on this Mac
-    "asdf"
-    "cmake"
-    "ekhtml"
-    "ffmpeg"
-    "lcov"
-    "libusb"
-    "yarn"
-  ];
+  # See ./tools.nix for the package metadata model and field semantics.
+  tools = import ./tools.nix;
+
+  enabled = lib.filter (t: t.scope == "basic" || usePersonalSetup) tools;
+
+  isNixTool = t: t.platform == "all" && t.updatePolicy == "stable";
+  isHomebrewTool = t: t.platform == "macos" || t.updatePolicy == "fast";
+  isCaskTool = t: t.isCask or false;
+
+  nixTools = lib.filter isNixTool enabled;
+  brewTools = lib.filter (t: isHomebrewTool t && !isCaskTool t) enabled;
+  caskTools = lib.filter (t: isHomebrewTool t && isCaskTool t) enabled;
+
+  brewName = t: t.brewName or t.name;
 in
 {
   # Determinate already manages the Nix daemon, so nix-darwin shouldn't.
@@ -70,6 +28,7 @@ in
     home = "/Users/${user}";
   };
   system.stateVersion = 6;
+  environment.systemPackages = map (t: pkgs.${t.nixName or t.name}) nixTools;
   system.defaults = {
     NSGlobalDomain = {
       AppleInterfaceStyle = "Dark";
@@ -104,7 +63,7 @@ in
     onActivation.cleanup = "zap";  # remove anything not listed here
     onActivation.autoUpdate = true;
     onActivation.extraFlags = [ "--force" ];
-    brews = basicBrews ++ lib.optionals usePersonalSetup personalBrews;
-    casks = basicCasks ++ lib.optionals usePersonalSetup personalCasks;
+    brews = map brewName brewTools;
+    casks = map brewName caskTools;
   };
 }

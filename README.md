@@ -118,11 +118,11 @@ On a Mac you were already using, files like `~/.zshrc`, `~/.zshenv`, or `~/.clau
 Without this setting, home-manager refuses to activate rather than clobber them.
 With it, the first switch moves each conflicting file to `<name>.before-home-manager` next to it and links in this repo's version instead - diff the two afterward if you want to carry anything over.
 
-**About `herdr`:** it's in the `basicBrews` list.
+**About `herdr`:** it's a `scope = "basic"` entry in `tools.nix`.
 It's a real public Homebrew formula (`brew info herdr` finds it in homebrew-core, no tap needed), so it will install fine.
-If you don't use it, just remove it from `basicBrews` in your copy.
+If you don't use it, just remove its entry from `tools.nix` in your copy.
 
-**Personal vs. basic brews and casks:** `configuration.nix` splits both `brews` and `casks` into `basicBrews`/`basicCasks` (dev tooling wanted on any machine: herdr, thefuck, skills, wezterm, claude-code, codex) and `personalBrews`/`personalCasks` (this Mac's own toolchain and GUI apps: Slack, Discord, Notion, Figma, a smart-contract toolchain, a Python/Postgres toolchain, and more). One toggle controls both: flip `usePersonalSetup` in `flake.nix` to `false` for dev tooling only - handy for a second, non-personal machine (e.g. a server). Still macOS-only.
+**Package metadata:** `tools.nix` is the single source of truth for every CLI tool and GUI app - each entry declares `scope` (`basic` = every setup, `personal` = only when `usePersonalSetup = true`), `platform` (`all` vs `macos`-only), and `updatePolicy` (`stable` vs `fast`), with optional `isCask`, `brewName`, and `nixName` overrides. `configuration.nix` derives the Nix package list, `homebrew.brews`, and `homebrew.casks` from that table - see the field semantics documented at the top of `tools.nix`. One toggle controls both scopes: flip `usePersonalSetup` in `flake.nix` to `false` for dev tooling only - handy for a second, non-personal machine (e.g. a server). Still macOS-only.
 
 **Heads-up:**
 
