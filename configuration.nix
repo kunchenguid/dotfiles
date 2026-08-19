@@ -7,11 +7,11 @@ let
     "wezterm"
     "claude-code"
     "codex"
-    "opensuperwhisper"
   ];
   # GUI apps for this personal Mac only - leave these out of any other
   # machine's cask list.
   personalCasks = [
+    "opensuperwhisper"
     "slack"
     "discord"
     "notion"
@@ -32,6 +32,11 @@ let
     "pi-coding-agent"
     "colima"
     "mosh"
+    "bzip2"
+    "gh"
+    "gnu-tar"
+    "tree"
+    "wget"
   ];
   # CLI tools for this personal Mac only.
   personalBrews = [
@@ -45,16 +50,11 @@ let
     "pyenv"
     # Everything else already installed on this Mac
     "asdf"
-    "bzip2"
     "cmake"
     "ekhtml"
     "ffmpeg"
-    "gh"
-    "gnu-tar"
     "lcov"
     "libusb"
-    "tree"
-    "wget"
     "yarn"
   ];
 in
