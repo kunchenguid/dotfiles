@@ -52,9 +52,10 @@
       }
     }
   },
+  "viewMode": "focus",
+  "awaySummaryEnabled": false,
+  "showThinkingSummaries": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark-ansi",
-  "viewMode": "focus",
-  "verbose": false,
-  "showThinkingSummaries": false
+  "verbose": false
 }
