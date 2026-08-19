@@ -47,5 +47,21 @@ test_linux_home_configurations_evaluate() {
   pass "homeConfigurations for x86_64-linux and aarch64-linux both evaluate to real derivations"
 }
 
+test_linux_home_manager_cli_enabled() {
+  if ! command -v nix >/dev/null 2>&1; then
+    echo "skip: nix not found for Linux home-manager CLI check"
+    return 0
+  fi
+  local system enabled
+  for system in x86_64-linux aarch64-linux; do
+    enabled=$(cd "$ROOT" && nix eval --json ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.programs.home-manager.enable" 2>/dev/null) \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" home-manager CLI setting failed to evaluate"
+    [ "$enabled" = "true" ] \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" must install the home-manager CLI so ./rebuild.sh works after bootstrap"
+  done
+  pass "home-manager CLI is installed by both Linux homeConfigurations outputs"
+}
+
 test_darwin_drvpath_unchanged
 test_linux_home_configurations_evaluate
+test_linux_home_manager_cli_enabled

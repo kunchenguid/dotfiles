@@ -25,6 +25,7 @@ in
   home.username = user;
   home.homeDirectory = if isDarwin then "/Users/${user}" else "/home/${user}";
   home.stateVersion = "24.11";
+  programs.home-manager.enable = !isDarwin;
   home.packages = with pkgs; [
     # cli i use constantly
     ripgrep   # fast search
