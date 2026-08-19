@@ -48,6 +48,16 @@ in
       }
       zle -N ai-fill-buffer
       bindkey '^G' ai-fill-buffer
+
+      private_env="$HOME/.dotfiles/home/.config/zsh/private-env.zsh"
+      if [[ -r "$private_env" ]]; then
+        source "$private_env"
+      fi
+      unset private_env
+
+      if [[ -n "''${HETZNER_HOST:-}" ]]; then
+        alias hetzner="ssh root@$HETZNER_HOST"
+      fi
     '';
     shellAliases = {
       ".." = "cd ..";

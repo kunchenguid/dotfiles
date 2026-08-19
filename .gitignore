@@ -18,5 +18,8 @@ result-*
 # Pi Calm is a runtime toggle; its local state file is never tracked
 /home/.pi/agent/calm
 
+# Private shell values read by home.nix; copy from the example and keep local
+/home/.config/zsh/private-env.zsh
+
 # no-mistakes local validation state - never commit in this public repo
 .no-mistakes/
