@@ -50,6 +50,7 @@ in
       bindkey '^G' ai-fill-buffer
 
       private_env="$HOME/.dotfiles/home/.config/zsh/private-env.zsh"
+      unset HETZNER_HOST
       if [[ -r "$private_env" ]]; then
         source "$private_env"
       fi

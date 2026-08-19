@@ -18,19 +18,17 @@ fi
 TMP_ROOT=$(dotfiles_test_tmproot hetzner-alias)
 TEST_HOME="$TMP_ROOT/home"
 ZDOTDIR="$TMP_ROOT/zdotdir"
-PRIVATE_DIR="$ROOT/home/.config/zsh"
+PRIVATE_DIR="$TEST_HOME/.dotfiles/home/.config/zsh"
 PRIVATE_FILE="$PRIVATE_DIR/private-env.zsh"
 MISSING_ALIAS_OUTPUT="$TMP_ROOT/hetzner-alias-missing"
 PLACEHOLDER_HOST="hetzner.example.invalid"
 
 cleanup_private_env() {
-  rm -f "$PRIVATE_FILE"
   dotfiles_test_cleanup
 }
 trap cleanup_private_env EXIT
 
 mkdir -p "$TEST_HOME" "$ZDOTDIR" "$PRIVATE_DIR"
-ln -s "$ROOT" "$TEST_HOME/.dotfiles"
 
 render_zshrc() {
   nix eval --raw \
@@ -44,7 +42,7 @@ print_alias() {
 
 rm -f "$PRIVATE_FILE"
 render_zshrc
-if print_alias >"$MISSING_ALIAS_OUTPUT" 2>&1; then
+if HETZNER_HOST=ambient.example.invalid print_alias >"$MISSING_ALIAS_OUTPUT" 2>&1; then
   fail "hetzner alias exists without the private env file"
 fi
 
