@@ -1,12 +1,29 @@
-{ config, pkgs, user, usePersonalSetup, ... }:
+{ config, pkgs, lib, user, usePersonalSetup, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/.dotfiles";
+
+  # true on macOS (via nix-darwin's home-manager integration), false on the
+  # standalone Ubuntu homeConfigurations outputs (see flake.nix). Derived
+  # from pkgs.stdenv rather than a passed-in flag, so each flake output gets
+  # its own correct platform context automatically.
+  isDarwin = pkgs.stdenv.isDarwin;
+  osLabel = if isDarwin then "macOS" else "Linux";
+
+  # currentPlatform for ./tool-selection.nix: "macos" here always resolves
+  # to the exact same value configuration.nix hardcodes, so this branch is
+  # provably a no-op on Darwin (see the drvPath-diff test in tests/).
+  currentPlatform = if isDarwin then "macos" else "ubuntu";
+  sel = import ./tool-selection.nix { inherit lib usePersonalSetup currentPlatform; };
+  # nix-darwin's own environment.systemPackages already installs the macOS
+  # Nix tools (configuration.nix); standalone home-manager on Ubuntu has no
+  # such system-level list, so home.packages is the only place to add them.
+  linuxNixTools = map (t: pkgs.${sel.nixName t}) sel.nixTools;
 in
 
 {
   home.username = user;
-  home.homeDirectory = "/Users/${user}";
+  home.homeDirectory = if isDarwin then "/Users/${user}" else "/home/${user}";
   home.stateVersion = "24.11";
   home.packages = with pkgs; [
     # cli i use constantly
@@ -26,7 +43,7 @@ in
     # what MacTeX used to provide; minimal scheme (just pdflatex/xelatex) on
     # non-personal machines (e.g. a server).
     (if usePersonalSetup then texlive.combined.scheme-full else texlive.combined.scheme-basic)
-  ];
+  ] ++ lib.optionals (!isDarwin) linuxNixTools;
   fonts.fontconfig.enable = true;
   home.sessionVariables.EDITOR = "nvim";
   home.sessionVariables.CLICOLOR = "1";
@@ -42,7 +59,7 @@ in
       # Replace the current input line with an AI-generated one, no execution.
       ai-fill-buffer() {
         [[ -z $BUFFER ]] && return
-        local sys="Output ONLY the raw zsh command for macOS that accomplishes the task below. No explanation, no markdown, no code fences, no commentary - just the command, ready to run as-is."
+        local sys="Output ONLY the raw zsh command for ${osLabel} that accomplishes the task below. No explanation, no markdown, no code fences, no commentary - just the command, ready to run as-is."
         BUFFER=$(claude -p --tools="" --append-system-prompt "$sys" "$BUFFER" 2>/dev/null | sed -e '/^```/d' -e '/^[[:space:]]*$/d')
         CURSOR=$#BUFFER
       }
@@ -57,10 +74,7 @@ in
       m = "git switch main";
       cc = "claude --dangerously-skip-permissions";
       co = "codex -s workspace-write -a never";
-      cpath = "echo -n `pwd`|pbcopy";
-      gitverify = "ssh-add /Users/${user}/.ssh/id_rsa";
-      disablesleep = "sudo pmset -a disablesleep 1";
-      enablesleep = "sudo pmset -a disablesleep 0";
+      gitverify = "ssh-add ${config.home.homeDirectory}/.ssh/id_rsa";
 
       # One-shot, no tools
       askclaude = ''claude -p --tools=""'';
@@ -76,6 +90,12 @@ in
       chatclaude = ''claude --tools ""'';
       chatpi = "pi --no-context-files --exclude-tools read,write,edit,bash";
       chatcodex = "codex --sandbox read-only --ask-for-approval never";
+    } // lib.optionalAttrs isDarwin {
+      # macOS-only: clipboard (pbcopy) and sleep control (pmset) have no
+      # direct Linux equivalent wired up here.
+      cpath = "echo -n `pwd`|pbcopy";
+      disablesleep = "sudo pmset -a disablesleep 1";
+      enablesleep = "sudo pmset -a disablesleep 0";
     };
   };
 

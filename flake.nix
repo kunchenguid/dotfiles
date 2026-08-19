@@ -29,6 +29,10 @@
       # false installs dev tooling only (e.g. for a server), with the
       # minimal TeX Live scheme (just pdflatex/xelatex).
       usePersonalSetup = true;
+      # Ubuntu 22.04 has no nix-darwin equivalent, so its path is standalone
+      # home-manager (below) instead of a darwinConfigurations-style system
+      # config: no root, no sudo, no Homebrew.
+      linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
     in
     {
       darwinConfigurations.${hostLabel} = nix-darwin.lib.darwinSystem {
@@ -46,5 +50,15 @@
           }
         ];
       };
+
+      # bootstrap.sh/rebuild.sh select "${user}@$(uname -m)-linux" on Ubuntu.
+      homeConfigurations = builtins.listToAttrs (map (system: {
+        name = "${user}@${system}";
+        value = home-manager.lib.homeManagerConfiguration {
+          pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
+          extraSpecialArgs = { inherit user usePersonalSetup; };
+          modules = [ ./home.nix ];
+        };
+      }) linuxSystems);
     };
 }
