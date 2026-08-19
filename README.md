@@ -122,7 +122,48 @@ With it, the first switch moves each conflicting file to `<name>.before-home-man
 It's a real public Homebrew formula (`brew info herdr` finds it in homebrew-core, no tap needed), so it will install fine.
 If you don't use it, just remove its entry from `tools.nix` in your copy.
 
-**Package metadata:** `tools.nix` is the single source of truth for every CLI tool and GUI app - each entry declares `scope` (`basic` = every setup, `personal` = only when `usePersonalSetup = true`), `platform` (`all` vs `macos`-only), and `updatePolicy` (`stable` vs `fast`), with optional `isCask`, `brewName`, and `nixName` overrides. `configuration.nix` derives the Nix package list, `homebrew.brews`, and `homebrew.casks` from that table - see the field semantics documented at the top of `tools.nix`. One toggle controls both scopes: flip `usePersonalSetup` in `flake.nix` to `false` for dev tooling only - handy for a second, non-personal machine (e.g. a server). Still macOS-only.
+**Package metadata:** `tools.nix` is the single source of truth for every CLI tool and GUI app. Each entry answers four questions:
+
+| Property       | Question                                        | Values                       |
+| -------------- | ------------------------------------------------ | ----------------------------- |
+| `scope`        | Do I need this on a minimal dev machine?          | `basic` / `personal`          |
+| `platform`     | Where does this tool make sense?                  | `all` / `macos` / `ubuntu`    |
+| `updatePolicy` | Do I want the latest upstream version quickly?    | `stable` / `fast`             |
+| `isCask`       | If installed through Homebrew, is it a cask?      | `true` / omitted              |
+
+(`brewName`/`nixName` are optional overrides for when the Homebrew or nixpkgs name differs from the tool's `name`. `platform = "ubuntu"` isn't used by any entry yet - see below.)
+
+`configuration.nix` turns that table into `environment.systemPackages`, `homebrew.brews`, and `homebrew.casks` in two stages. First, whether the tool exists on this machine at all:
+
+```text
+scope:
+  basic setup    -> only scope=basic
+  personal setup -> basic + personal
+
+platform:
+  platform=all             -> any OS
+  platform=currentPlatform -> this OS
+  anything else            -> skip
+```
+
+Only then is the installer picked, based on `currentPlatform` (hardcoded to `"macos"` today - no OS detection or Ubuntu bootstrap logic exists yet):
+
+```text
+macOS (active today):
+  stable + all   -> Nix
+  fast + all     -> Homebrew
+  macos-only     -> Homebrew
+
+Ubuntu (future, not implemented):
+  stable + all     -> Nix
+  fast + all       -> native installer
+  stable + ubuntu  -> Nix
+  fast + ubuntu    -> native installer
+```
+
+The invariant that makes this Ubuntu-ready without a later reorg: installer selection always depends on `currentPlatform`, not on a tool's fields alone. A `platform=all; updatePolicy=fast` tool is Homebrew-managed only because `currentPlatform == "macos"` right now - on a future Ubuntu machine that same tool would go through a native installer instead. A `platform=ubuntu` tool can never enter the Homebrew lists while `currentPlatform == "macos"`. `isCask` only decides `homebrew.casks` vs `homebrew.brews` for a tool the platform stage already selected for Homebrew - it plays no role in which installer is chosen. See `isEnabled`/`isForCurrentPlatform`/`useNix`/`useHomebrew`/`useNative` in `configuration.nix` for the exact predicates.
+
+One toggle controls both scopes: flip `usePersonalSetup` in `flake.nix` to `false` for dev tooling only - handy for a second, non-personal machine (e.g. a server). Still macOS-only.
 
 **Heads-up:**
 
