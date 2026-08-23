@@ -1,5 +1,13 @@
 # dotfiles
 
+<p align="center">
+  <a href="https://discord.gg/Wsy2NpnZDu"
+    ><img
+      alt="Discord"
+      src="https://img.shields.io/discord/1439901831038763092?style=flat-square&label=discord"
+  /></a>
+</p>
+
 Watch the walkthrough: https://youtu.be/5N-okeDdIuI
 
 My personal Mac setup, managed with nix-darwin and home-manager.
