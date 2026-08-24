@@ -48,8 +48,12 @@ in
     # skills and pi-coding-agent are npm-backed CLIs (their ~/.local/bin
     # launchers shebang into `node`), so Node needs to stay on PATH after
     # install, not just during it - unlike macOS, where the Homebrew
-    # formula's own `node` dependency covers this.
-    ++ lib.optionals (!isDarwin) [ nodejs ];
+    # formula's own `node` dependency covers this. gnutar: codex's installer
+    # shells out to `tar` to unpack its own download, and a genuinely minimal
+    # Ubuntu base image (unlike Docker Hub's ubuntu:22.04) can lack a system
+    # tar binary entirely - Nix-managed here so it's always present rather
+    # than assumed from the base image.
+    ++ lib.optionals (!isDarwin) [ nodejs gnutar ];
   # Fast-moving tools.nix entries with a verified non-interactive install
   # path (see tools.nix's nativeInstallUrl/nativeInstallNpmPackage comments
   # for each tool's evidence). Skips the install when the binary is already
@@ -67,14 +71,18 @@ in
         else
           (
             # install.sh scripts (herdr's included) shell out to their own
-            # curl/coreutils calls internally, so both the outer curl and the
-            # piped-in script need those on PATH - export, don't prefix, so it
-            # covers the whole pipeline instead of just curl. $HOME/.local/bin
-            # is included so codex's installer sees its target dir already on
-            # PATH and skips rewriting a shell profile; nodejs's bin is
-            # included for pi-coding-agent's installer and the npm branch
-            # below, both of which need `node`/`npm` present to do anything.
-            export PATH="${pkgs.curl}/bin:${pkgs.coreutils}/bin:${pkgs.gawk}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.nodejs}/bin:$HOME/.local/bin:$PATH"
+            # curl/coreutils/tar calls internally, so both the outer curl and
+            # the piped-in script need those on PATH - export, don't prefix,
+            # so it covers the whole pipeline instead of just curl.
+            # $HOME/.local/bin is included so codex's installer sees its
+            # target dir already on PATH and skips rewriting a shell profile;
+            # nodejs's bin is included for pi-coding-agent's installer and
+            # the npm branch below, both of which need `node`/`npm` present
+            # to do anything. gnutar's bin is included because codex's
+            # installer hard-requires `tar` to unpack its own download, and a
+            # genuinely minimal base image's PATH (appended after this list)
+            # may not have one - see home.packages' gnutar entry above.
+            export PATH="${pkgs.curl}/bin:${pkgs.coreutils}/bin:${pkgs.gawk}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.gnutar}/bin:${pkgs.nodejs}/bin:$HOME/.local/bin:$PATH"
             # CODEX_NON_INTERACTIVE: skips codex's installer prompts (safe
             # no-op for the other tools, which don't read it).
             # NPM_CONFIG_PREFIX: nodejs's own npm prefix lives in the
@@ -89,7 +97,13 @@ in
             '' else ''
               ${pkgs.nodejs}/bin/npm install -g ${lib.escapeShellArg t.nativeInstallNpmPackage}
             ''}
-          )
+          # Fault isolation: activation scripts run under `set -e`, so one
+          # tool's install failing (e.g. a transient network error, or an
+          # installer's own environment check) would otherwise abort every
+          # later tool in this same loop without ever attempting them. Each
+          # tool's block is independently caught and reported loudly instead
+          # - a silent partial install would be worse than a visible one.
+          ) || echo "WARNING: native install of ${t.name} failed (exit $?) - continuing with remaining tools" >&2
         fi
       fi
     '') sel.nativeInstallTools)

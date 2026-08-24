@@ -175,6 +175,79 @@ pi-coding-agent pi"
   pass "claude-code, codex, herdr, skills, and pi-coding-agent's native installers are all wired into home.activation, correctly keyed to their real ~/.local/bin binary names, for both Linux homeConfigurations outputs"
 }
 
+test_linux_gnutar_present_for_native_installers() {
+  if ! command -v nix >/dev/null 2>&1; then
+    echo "skip: nix not found for Linux gnutar check"
+    return 0
+  fi
+  # codex's own installer hard-requires a `tar` binary to unpack its
+  # download ("tar is required to install Codex."), and a genuinely minimal
+  # Ubuntu base image can lack one entirely - unlike Docker Hub's
+  # ubuntu:22.04, which happens to ship tar and can mask this in testing.
+  # gnutar must be Nix-managed (home.packages) and wired into
+  # installNativeTools' own curated PATH export, not just assumed present.
+  local system names data
+  for system in x86_64-linux aarch64-linux; do
+    names=$(cd "$ROOT" && nix eval --json ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.packages" \
+      --apply 'pkgs: map (p: p.pname or p.name) pkgs' 2>/dev/null) \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" home.packages failed to evaluate"
+    assert_contains "$names" "\"gnutar\"" \
+      "homeConfigurations.\"${FLAKE_USER}@${system}\" is missing gnutar - codex's installer requires tar, and a minimal base image may not have one"
+
+    data=$(cd "$ROOT" && nix eval --raw ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.activation.installNativeTools.data" 2>/dev/null) \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools activation script failed to evaluate"
+    assert_contains "$data" "gnutar" \
+      "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools does not put gnutar on its curated PATH export"
+  done
+  pass "gnutar is Nix-managed and wired into installNativeTools' PATH for both Linux homeConfigurations outputs"
+}
+
+test_linux_native_install_fault_isolation() {
+  if ! command -v nix >/dev/null 2>&1; then
+    echo "skip: nix not found for Linux fault-isolation check"
+    return 0
+  fi
+  # Activation scripts run under set -e: without per-tool isolation, one
+  # tool's install failing aborts every later tool in the same
+  # concatMapStrings loop before it's ever attempted (this is exactly how
+  # codex's real "tar is required" failure also took down herdr, ordered
+  # right after it - see AGENTS.md). Replace each tool's real network
+  # install command with a deterministic local stand-in (no network needed):
+  # codex is forced to fail, the other four are forced to succeed. A correct
+  # activation script still installs all four survivors and reports the
+  # codex failure loudly instead of aborting silently.
+  local system data patched tmp_home out exit_code bin
+  for system in x86_64-linux aarch64-linux; do
+    data=$(cd "$ROOT" && nix eval --raw ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.activation.installNativeTools.data" 2>/dev/null) \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools activation script failed to evaluate"
+
+    patched=$(printf '%s\n' "$data" \
+      | sed -E 's#.*curl -fsSL https://claude\.ai/install\.sh.*#mkdir -p "$HOME/.local/bin" \&\& touch "$HOME/.local/bin/claude" \&\& chmod +x "$HOME/.local/bin/claude"#' \
+      | sed -E 's#.*curl -fsSL https://chatgpt\.com/codex/install\.sh.*#false#' \
+      | sed -E 's#.*curl -fsSL https://herdr\.dev/install\.sh.*#mkdir -p "$HOME/.local/bin" \&\& touch "$HOME/.local/bin/herdr" \&\& chmod +x "$HOME/.local/bin/herdr"#' \
+      | sed -E 's#.*npm install -g skills.*#mkdir -p "$HOME/.local/bin" \&\& touch "$HOME/.local/bin/skills" \&\& chmod +x "$HOME/.local/bin/skills"#' \
+      | sed -E 's#.*curl -fsSL https://pi\.dev/install\.sh.*#mkdir -p "$HOME/.local/bin" \&\& touch "$HOME/.local/bin/pi" \&\& chmod +x "$HOME/.local/bin/pi"#')
+
+    tmp_home=$(dotfiles_test_tmproot "dotfiles-fault-isolation-$system")
+    out=$(HOME="$tmp_home" bash -eu -o pipefail -c "$patched" 2>&1)
+    exit_code=$?
+    [ "$exit_code" -eq 0 ] \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools must not hard-fail the whole activation when one tool's install fails (exit $exit_code), got: $out"
+
+    assert_contains "$out" "WARNING: native install of codex failed" \
+      "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools must report a failed tool loudly, got: $out"
+
+    [ ! -e "$tmp_home/.local/bin/codex" ] \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" fault-isolation test fixture is broken: codex's forced failure still produced a binary"
+
+    for bin in claude herdr skills pi; do
+      [ -x "$tmp_home/.local/bin/$bin" ] \
+        || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools must still install $bin when codex's install fails, got: $out"
+    done
+  done
+  pass "installNativeTools isolates each tool's install failure for both Linux homeConfigurations outputs - one broken installer no longer blocks the rest"
+}
+
 test_darwin_native_install_absent() {
   if ! command -v nix >/dev/null 2>&1; then
     echo "skip: nix not found for Darwin native-install absence check"
@@ -194,4 +267,6 @@ test_linux_home_manager_cli_enabled
 test_linux_treesitter_buildtools_present
 test_linux_nodejs_present_for_npm_backed_native_tools
 test_linux_native_install_tools_wired
+test_linux_gnutar_present_for_native_installers
+test_linux_native_install_fault_isolation
 test_darwin_native_install_absent
