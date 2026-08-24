@@ -49,7 +49,7 @@ fi
 printf 'export HETZNER_HOST="%s"\n' "$PLACEHOLDER_HOST" >"$PRIVATE_FILE"
 render_zshrc
 actual=$(print_alias) || fail "hetzner alias missing when private env file is present"
-assert_contains "$actual" "ssh root@$PLACEHOLDER_HOST" "hetzner alias does not use the private host value"
+assert_contains "$actual" "ssh thomasharper@$PLACEHOLDER_HOST" "hetzner alias does not use the private host value"
 
 if git -C "$ROOT" ls-files --error-unmatch home/.config/zsh/private-env.zsh >/dev/null 2>&1; then
   fail "private zsh env file is tracked"
