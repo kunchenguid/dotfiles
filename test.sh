@@ -19,19 +19,21 @@ for test_file in tests/*.test.sh; do
   output=$(bash "$test_file" 2>&1)
   exit_code=$?
 
-  # Check for skip indicator (output contains "skip: ")
-  if echo "$output" | grep -q "^skip: "; then
-    ((skipped++))
-    echo "$test_name - SKIP"
-  elif [ $exit_code -eq 0 ]; then
-    ((passed++))
-    echo "$test_name - PASS"
-  else
+  if [ $exit_code -ne 0 ]; then
     ((failed++))
     failed_tests+=("$test_name")
     echo "$test_name - FAIL"
     # Show first error line for context
     echo "$output" | grep "^not ok" | head -1 | sed 's/^/  /'
+  elif echo "$output" | grep -q "^ok - "; then
+    ((passed++))
+    echo "$test_name - PASS"
+  elif echo "$output" | grep -q "^skip: "; then
+    ((skipped++))
+    echo "$test_name - SKIP"
+  else
+    ((passed++))
+    echo "$test_name - PASS"
   fi
 done
 
