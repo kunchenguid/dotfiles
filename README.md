@@ -104,7 +104,7 @@ cd dotfiles
 
 On Linux, `bootstrap.sh` does four things: installs Determinate Nix (same installer as macOS), symlinks this repo to `~/.dotfiles`, offers to fix the `user` line in `flake.nix` if it doesn't match your Ubuntu username, then runs the first `home-manager switch --flake ~/.dotfiles#<user>@<system>` (pinned to the home-manager `release-26.05` branch, same pattern as the macOS `darwin-rebuild` bootstrap). `<system>` is `x86_64-linux` or `aarch64-linux`, detected from `uname -m`. After that, `./rebuild.sh` works the same way it does on macOS.
 
-What you get is intentionally narrower than the macOS setup: no Homebrew casks/GUI apps (there's no desktop environment to run them), and no macOS-only CLI tools (`thefuck`, `echidna`, `solc-select`, `tenderly`, `postgresql`, `libpq`, `colima` - see `tools.nix`'s `platform = "macos"` entries). Fast-moving `platform = "all"` tools (`claude-code`, `codex`, `herdr`, `skills`, `pi-coding-agent`) are also not yet installed automatically on Ubuntu - `tool-selection.nix`'s `useNative` correctly identifies them as needing a non-Nix installer (see "Package metadata" below), but that installer isn't wired up yet; install them manually per their own docs for now.
+What you get is intentionally narrower than the macOS setup: no Homebrew casks/GUI apps (there's no desktop environment to run them), and no macOS-only CLI tools (`thefuck`, `echidna`, `solc-select`, `tenderly`, `postgresql`, `libpq`, `colima` - see `tools.nix`'s `platform = "macos"` entries). Of the fast-moving `platform = "all"` tools (`claude-code`, `codex`, `herdr`, `skills`, `pi-coding-agent`), `tool-selection.nix`'s `useNative` correctly identifies all five as needing a non-Nix installer on Ubuntu (see "Package metadata" below), and all five are wired up: each `tools.nix` entry carries either a `nativeInstallUrl` pointing at the tool's own non-interactive `install.sh` (`claude-code`, `codex`, `herdr`, `pi-coding-agent`) or a `nativeInstallNpmPackage` for tools with no install script at all, just an npm package (`skills`). `home.nix`'s `installNativeTools` activation script runs each one on every `rebuild.sh` (skipping the ones already present under their real `~/.local/bin` launcher name - see `nativeInstallBinName` for the two whose launcher name differs from their `tools.nix` entry name), with `CODEX_NON_INTERACTIVE=1`, `NPM_CONFIG_PREFIX=$HOME/.local`, and `~/.local/bin` pre-populated on `PATH` so none of the five ever fall into an interactive prompt or a shell-rc-rewriting branch, and `~/.local/bin` on `home.sessionPath` so they're actually reachable afterward. `pkgs.nodejs` is included in `home.packages` on Linux because `skills` and `pi-coding-agent`'s launchers are npm-backed and shebang into `node` at runtime, not just during install.
 
 ## Make it yours
 
@@ -186,9 +186,9 @@ If you don't use it, just remove its entry from `tools.nix` in your copy.
 | `updatePolicy` | Do I want the latest upstream version quickly?    | `stable` / `fast`             |
 | `isCask`       | If installed through Homebrew, is it a cask?      | `true` / omitted              |
 
-(`brewName`/`nixName` are optional overrides for when the Homebrew or nixpkgs name differs from the tool's `name`. `platform = "ubuntu"` is used by the `gcc`/`gnumake`/`pkg-config` build-toolchain entries, needed so nvim-treesitter can compile parsers on Ubuntu - macOS gets the same via Xcode Command Line Tools instead.)
+(`brewName`/`nixName` are optional overrides for when the Homebrew or nixpkgs name differs from the tool's `name`. `nativeInstallUrl` is an optional URL to a non-interactive, PATH-side-effect-free `install.sh` for a Ubuntu `useNative` tool - see below and `home.nix`'s `installNativeTools` activation script; `claude-code`, `codex`, `herdr`, and `pi-coding-agent` set it. `nativeInstallNpmPackage` is the same idea for a tool with no install script at all, just an npm package to `npm install -g` - only `skills` sets it. `nativeInstallBinName` overrides the `~/.local/bin` launcher name the installer's "already installed" skip-check looks for, for the rare tool (`claude-code` -> `claude`, `pi-coding-agent` -> `pi`) whose upstream launcher name differs from its `tools.nix` entry name; it defaults to `name`. `platform = "ubuntu"` is used by the `gcc`/`gnumake`/`pkg-config` build-toolchain entries, needed so nvim-treesitter can compile parsers on Ubuntu - macOS gets the same via Xcode Command Line Tools instead.)
 
-`tool-selection.nix` turns that table into concrete selections in two stages. `configuration.nix` consumes those selections for macOS `environment.systemPackages`, `homebrew.brews`, and `homebrew.casks`; `home.nix` consumes them for Ubuntu `home.packages`; and `nativeTools` records the Ubuntu tools that still need installer wiring. First, whether the tool exists on this machine at all:
+`tool-selection.nix` turns that table into concrete selections in two stages. `configuration.nix` consumes those selections for macOS `environment.systemPackages`, `homebrew.brews`, and `homebrew.casks`; `home.nix` consumes them for Ubuntu `home.packages` and, for the `nativeInstallTools` subset, an activation script that runs each one's `nativeInstallUrl` script (or `npm install -g` for `nativeInstallNpmPackage`) directly. First, whether the tool exists on this machine at all:
 
 ```text
 scope:
@@ -211,9 +211,9 @@ macOS:
 
 Ubuntu:
   stable + all     -> Nix
-  fast + all       -> native installer (not yet wired up - see "Ubuntu setup")
+  fast + all       -> native installer (only wired up if nativeInstallUrl or nativeInstallNpmPackage is set - see "Ubuntu setup")
   stable + ubuntu  -> Nix
-  fast + ubuntu    -> native installer (not yet wired up)
+  fast + ubuntu    -> native installer (only wired up if nativeInstallUrl or nativeInstallNpmPackage is set)
 ```
 
 `currentPlatform` isn't one global constant: `configuration.nix` hardcodes it to `"macos"` (there's only one macOS target), while each Ubuntu `homeConfigurations."<user>@<system>"` output in `home.nix` derives it from `pkgs.stdenv.isDarwin`, so it's correct per-output rather than a single file-level toggle that would only ever be right for one platform at a time.
@@ -235,7 +235,7 @@ One toggle controls both scopes: flip `usePersonalSetup` in `flake.nix` to `fals
   Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew for the macOS `darwinConfigurations.mac` output, and nixpkgs + home-manager (standalone, no nix-darwin) for the Linux `homeConfigurations."<user>@<system>"` outputs; `usePersonalSetup` selects the brews/casks/Nix-package profile on both.
 - `configuration.nix` - macOS-only system-level config: system defaults, Homebrew, and macOS package selection (see "Package metadata" above).
 - `tools.nix` - the per-tool metadata table every platform selects packages from.
-- `tool-selection.nix` - the shared `isEnabled`/`isForCurrentPlatform`/`useNix`/`useHomebrew`/`useNative` predicates that turn `tools.nix` into concrete package lists for one `currentPlatform`; used by both `configuration.nix` (macOS) and `home.nix` (Ubuntu).
+- `tool-selection.nix` - the shared `isEnabled`/`isForCurrentPlatform`/`useNix`/`useHomebrew`/`useNative` predicates and selected output lists that turn `tools.nix` into concrete installers for one `currentPlatform`; used by both `configuration.nix` (macOS) and `home.nix` (Ubuntu).
 - `home.nix` - user-level config: shell, packages, prompt, and the symlinks described below. Shared between macOS and Ubuntu; platform-specific bits (home directory, Nix-managed package list, a couple of aliases) branch on `pkgs.stdenv.isDarwin`.
 - `rebuild.sh` - re-applies the config after the first switch (macOS or Ubuntu).
   Run this every time you make a change.
@@ -249,11 +249,7 @@ You only run `./rebuild.sh` when you change something that isn't just a symlinke
 
 ## Optional Pi configuration
 
-Pi is an opt-in CLI, not a dependency this repository vendors. Install it from its owner with the [official Pi instructions](https://pi.dev), for example:
-
-```sh
-npm install -g --ignore-scripts @earendil-works/pi-coding-agent
-```
+Pi is an opt-in CLI, not a dependency this repository vendors. The CLI itself is selected through `tools.nix` like the other managed tools; see "Package metadata" for how macOS and Ubuntu choose its installer. If you adapt only this Pi config without the package metadata, install Pi from its owner with the [official Pi instructions](https://pi.dev).
 
 [Pi Launcher](https://github.com/kunchenguid/homebrew-tap) is also optional and installed from its owner, not declared by this config:
 
@@ -280,7 +276,7 @@ The version and commit are immutable pins, so Pi does not move them during packa
 
 Both packages execute with your full user permissions and must be trusted like any other executable code. The compaction package is experimental, sends the relevant OpenAI compaction and continuity data to OpenAI, and upstream declares the stale peer range `>=0.80.9 <0.81.0`; this exact immutable ref was locally proven to load and perform remote compaction on Pi 0.82.0. Do not treat that proof as a guarantee for a different Pi version or a different package ref.
 
-Home Manager deliberately does not manage `~/.pi/agent` itself, or Pi authentication, sessions, trust decisions, caches, npm/git package trees, or any other runtime state. The model overrides contain no credentials or endpoint settings, do not choose a default model, and only take effect after you authenticate Pi yourself. This remains an additive post-video layer: it does not install Pi, a launcher, or package source code into this repository.
+Home Manager deliberately does not manage `~/.pi/agent` itself, or Pi authentication, sessions, trust decisions, caches, npm/git package trees, or any other runtime state. The model overrides contain no credentials or endpoint settings, do not choose a default model, and only take effect after you authenticate Pi yourself. This remains an additive post-video layer: it does not vendor Pi, a launcher, or package source code into this repository.
 
 ## Notes
 
