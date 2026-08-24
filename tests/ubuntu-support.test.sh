@@ -186,9 +186,10 @@ test_linux_archive_tools_present_for_native_installers() {
   # ubuntu:22.04, which happens to ship tar and can mask this in testing.
   # gnutar and gzip must be Nix-managed (home.packages) and wired into
   # installNativeTools' own curated PATH export, not just assumed present.
-  local current_system system names data gnutar_path gzip_path patched tmp_home empty_path fixture out exit_code
+  local current_system system names data gnutar_path gzip_path patched tmp_home empty_path fixture out exit_code ran_archive_check
   current_system=$(nix eval --raw --impure --expr builtins.currentSystem 2>/dev/null) \
     || fail "builtins.currentSystem failed to evaluate"
+  ran_archive_check=false
   for system in x86_64-linux aarch64-linux; do
     names=$(cd "$ROOT" && nix eval --json ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.packages" \
       --apply 'pkgs: map (p: p.pname or p.name) pkgs' 2>/dev/null) \
@@ -222,23 +223,32 @@ test_linux_archive_tools_present_for_native_installers() {
       | sed -E 's#.*npm install -g skills.*#:#' \
       | sed -E 's#.*curl -fsSL https://pi\.dev/install\.sh.*#:#')
 
-    tmp_home=$(dotfiles_test_tmproot "dotfiles-gnutar-path-$system")
-    empty_path="$tmp_home/empty-path"
-    mkdir -p "$empty_path"
-    fixture=
-    if [ "$system" = "$current_system" ] && command -v tar >/dev/null 2>&1; then
-      mkdir -p "$tmp_home/archive-src"
+    if [ "$system" = "$current_system" ]; then
+      tmp_home=$(dotfiles_test_tmproot "dotfiles-gnutar-path-$system")
+      empty_path="$tmp_home/empty-path"
+      mkdir -p "$empty_path" "$tmp_home/archive-src"
       printf 'payload\n' > "$tmp_home/archive-src/payload"
       fixture="$tmp_home/payload.tar.gz"
       tar -czf "$fixture" -C "$tmp_home/archive-src" payload \
         || fail "failed to create tar -xzf fixture for $system"
+      ran_archive_check=true
+      out=$(HOME="$tmp_home" PATH="$empty_path" TAR_XZF_FIXTURE="$fixture" /bin/bash -eu -o pipefail -c "$patched" 2>&1)
+      exit_code=$?
+      [ "$exit_code" -eq 0 ] \
+        || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools must resolve tar/gzip from its own curated PATH as $gnutar_path/bin/tar and $gzip_path/bin/gzip with ambient PATH stripped, and run tar -xzf (exit $exit_code), got: $out"
+      assert_not_contains "$out" "WARNING: native install of codex failed" \
+        "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools swallowed the tar/gzip check failure instead of proving codex's archive extraction path works, got: $out"
+      [ -f "$tmp_home/extracted/payload" ] \
+        || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools did not prove tar -xzf extracted the fixture"
     fi
-    out=$(HOME="$tmp_home" PATH="$empty_path" TAR_XZF_FIXTURE="$fixture" /bin/bash -eu -o pipefail -c "$patched" 2>&1)
-    exit_code=$?
-    [ "$exit_code" -eq 0 ] \
-      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools must resolve tar/gzip from its own curated PATH as $gnutar_path/bin/tar and $gzip_path/bin/gzip with ambient PATH stripped, and run tar -xzf when executable (exit $exit_code), got: $out"
   done
-  pass "gnutar and gzip are Nix-managed and wired into installNativeTools' PATH for both Linux homeConfigurations outputs"
+  if [ "$current_system" = "x86_64-linux" ] || [ "$current_system" = "aarch64-linux" ]; then
+    [ "$ran_archive_check" = "true" ] \
+      || fail "archive extraction check did not run on executable Linux output for current system $current_system"
+    pass "gnutar and gzip are Nix-managed for both Linux outputs; installNativeTools' curated PATH resolves and runs tar -xzf on the executable current-system output"
+  else
+    pass "gnutar and gzip are Nix-managed for both Linux outputs; executable tar -xzf verification is skipped on non-Linux current system $current_system"
+  fi
 }
 
 test_linux_native_install_fault_isolation() {
