@@ -56,7 +56,7 @@ in
       pull = "git pull";
       m = "git switch main";
       cc = "claude --dangerously-skip-permissions";
-      co = "codex --full-auto";
+      co = "codex -s workspace-write -a never";
       cpath = "echo -n `pwd`|pbcopy";
       gitverify = "ssh-add /Users/${user}/.ssh/id_rsa";
       disablesleep = "sudo pmset -a disablesleep 1";
