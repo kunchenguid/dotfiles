@@ -75,6 +75,12 @@ nix build .#darwinConfigurations.mac.system --dry-run
 
 If you renamed the host label in "Make it yours", substitute your label for `mac` in these commands. On Ubuntu, substitute `.#homeConfigurations."<user>@<system>".activationPackage` (e.g. `thomasharper@x86_64-linux`) for the `darwinConfigurations.mac.system` output.
 
+Run the test suite with:
+
+```sh
+./test.sh
+```
+
 ## Daily use
 
 Edit the config files in place, then apply:
