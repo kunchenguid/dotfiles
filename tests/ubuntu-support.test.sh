@@ -91,19 +91,56 @@ test_linux_herdr_native_install_wired() {
     echo "skip: nix not found for Linux herdr native-install check"
     return 0
   fi
-  local system data path_json
+  local system selected installs_herdr data tmp_home dry_run_output path_has_local_bin
   for system in x86_64-linux aarch64-linux; do
+    installs_herdr=$(cd "$ROOT" && nix eval --raw --impure --expr "
+      let
+        flake = builtins.getFlake \"path:$ROOT\";
+        pkgs = import flake.inputs.nixpkgs { system = \"$system\"; };
+        sel = import $ROOT/tool-selection.nix {
+          inherit (pkgs) lib;
+          usePersonalSetup = true;
+          currentPlatform = \"ubuntu\";
+        };
+        selected = map (t: { inherit (t) name nativeInstallUrl; }) sel.nativeInstallTools;
+      in if selected == [{ name = \"herdr\"; nativeInstallUrl = \"https://herdr.dev/install.sh\"; }] then \"true\" else \"false\"
+    " 2>/dev/null) \
+      || fail "tool-selection.nix nativeInstallTools failed to evaluate for $system"
+    if [ "$installs_herdr" != "true" ]; then
+      selected=$(cd "$ROOT" && nix eval --json --impure --expr "
+        let
+          flake = builtins.getFlake \"path:$ROOT\";
+          pkgs = import flake.inputs.nixpkgs { system = \"$system\"; };
+          sel = import $ROOT/tool-selection.nix {
+            inherit (pkgs) lib;
+            usePersonalSetup = true;
+            currentPlatform = \"ubuntu\";
+          };
+        in map (t: { inherit (t) name nativeInstallUrl; }) sel.nativeInstallTools
+      " 2>/dev/null)
+      fail "tool-selection.nix nativeInstallTools must contain exactly herdr's unattended installer for $system, got $selected"
+    fi
+
     data=$(cd "$ROOT" && nix eval --raw ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.activation.installNativeTools.data" 2>/dev/null) \
       || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" has no installNativeTools activation script - useNative correctly classifying herdr is not enough, something has to actually install it"
-    assert_contains "$data" "herdr" \
-      "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools script does not mention herdr"
-    assert_contains "$data" "https://herdr.dev/install.sh" \
-      "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools script does not call herdr's real install.sh"
+    tmp_home=$(dotfiles_test_tmproot "dotfiles-herdr-native-$system")
+    dry_run_output=$(HOME="$tmp_home" DRY_RUN_CMD=1 bash -eu -o pipefail -c "$data" 2>/dev/null) \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools activation failed in dry-run mode"
+    [ "$dry_run_output" = "Would install herdr via https://herdr.dev/install.sh" ] \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools dry-run did not request herdr install, got: $dry_run_output"
 
-    path_json=$(cd "$ROOT" && nix eval --json ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.sessionPath" 2>/dev/null) \
+    path_has_local_bin=$(cd "$ROOT" && nix eval --raw ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.sessionPath" \
+      --apply 'p: if builtins.elem "/home/thomasharper/.local/bin" p then "true" else "false"' 2>/dev/null) \
       || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" home.sessionPath failed to evaluate"
-    assert_contains "$path_json" ".local/bin" \
-      "homeConfigurations.\"${FLAKE_USER}@${system}\" does not put ~/.local/bin (where the native installer places herdr) on PATH - herdr would install but stay unreachable"
+    [ "$path_has_local_bin" = "true" ] \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" does not put ~/.local/bin (where the native installer places herdr) on PATH - herdr would install but stay unreachable"
+    mkdir -p "$tmp_home/.local/bin"
+    touch "$tmp_home/.local/bin/herdr"
+    chmod +x "$tmp_home/.local/bin/herdr"
+    dry_run_output=$(HOME="$tmp_home" DRY_RUN_CMD=1 bash -eu -o pipefail -c "$data" 2>/dev/null) \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools activation failed when herdr was already installed"
+    [ -z "$dry_run_output" ] \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools must skip when herdr is already installed, got: $dry_run_output"
   done
   pass "herdr's native installer is wired into home.activation and its install dir is on sessionPath for both Linux homeConfigurations outputs"
 }

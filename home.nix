@@ -62,6 +62,7 @@ in
           # covers the whole pipeline instead of just curl.
           (
             export PATH="${pkgs.curl}/bin:${pkgs.coreutils}/bin:${pkgs.gawk}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:$PATH"
+            set -o pipefail
             ${pkgs.curl}/bin/curl -fsSL ${lib.escapeShellArg t.nativeInstallUrl} | ${pkgs.runtimeShell}
           )
         fi
