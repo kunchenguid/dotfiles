@@ -149,12 +149,14 @@ add the new `Include` lines. If you used the old
 
 **Persistent ssh-agent (Linux only):** `home.nix` enables home-manager's
 `services.ssh-agent` on Linux, which runs a `systemd --user` unit that starts
-on login and lives until logout/reboot, with `SSH_AUTH_SOCK` wired into zsh
-automatically. Combined with `AddKeysToAgent yes` above, this means a key's
-passphrase only needs to be entered once per login/boot, even on a minimal
-server with no desktop environment or gnome-keyring. macOS is untouched -
-it already gets a persistent agent for free via launchd and the Keychain
-(`UseKeychain` above).
+on login with `SSH_AUTH_SOCK` wired into zsh automatically. On headless Ubuntu,
+the config also enables systemd lingering so the user service, ssh-agent, and
+cached keys survive after the SSH session that ran `rebuild.sh` closes.
+Combined with `AddKeysToAgent yes` above, this means a key's passphrase only
+needs to be entered once per boot or agent restart, even on a minimal server
+with no desktop environment or gnome-keyring. macOS is untouched - it already
+gets a persistent agent for free via launchd and the Keychain (`UseKeychain`
+above).
 
 **Git identity:** this config deliberately does not set your git name or email.
 Git will stop your first commit and tell you to set them (`git config --global user.name "Your Name"` and `git config --global user.email you@example.com`).
