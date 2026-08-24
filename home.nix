@@ -235,12 +235,35 @@ in
   # (no gnome-keyring, no desktop session) has no ssh-agent running at all,
   # so every git/ssh invocation either starts its own throwaway agent with
   # nothing cached or fails to find one, and the key passphrase is prompted
-  # every time. This starts a systemd --user service that lives across shells
-  # until logout/reboot, and home-manager wires SSH_AUTH_SOCK into
+  # every time. This starts a systemd --user service that lives across
+  # shells (see the lingering activation script below for surviving across
+  # SSH sessions too), and home-manager wires SSH_AUTH_SOCK into
   # programs.zsh automatically. macOS is unaffected (isDarwin = true there):
   # it already gets a persistent agent for free via launchd + Keychain
   # (UseKeychain above), so this would just add a redundant agent process.
   services.ssh-agent.enable = !isDarwin;
+
+  # Linux-only: without lingering, systemd-logind stops the user's systemd
+  # --user instance (and every unit in it, including ssh-agent above) as
+  # soon as the last login session for that user closes. On a headless
+  # server every SSH connection is its own session, so without this the
+  # agent - and any key added to it - is wiped between SSH connections and
+  # the passphrase prompt reappears every single time, exactly as if
+  # services.ssh-agent above did nothing. enable-linger takes effect
+  # immediately for the current user (no sudo, no reboot, no re-login) and
+  # is idempotent to rerun.
+  home.activation.enableSshAgentLinger = lib.hm.dag.entryAfter [ "writeBoundary" ] (
+    if isDarwin then
+      ""
+    else
+      ''
+        if [ -n "''${DRY_RUN_CMD:-}" ]; then
+          $DRY_RUN_CMD loginctl enable-linger "$(id -un)"
+        else
+          loginctl enable-linger "$(id -un)"
+        fi
+      ''
+  );
 
   # ~/.ssh/config itself is NOT managed - Colima and other tools rewrite it
   # freely, and rebuild must never overwrite or regenerate it. Instead we

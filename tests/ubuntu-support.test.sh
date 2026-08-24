@@ -20,11 +20,15 @@ FLAKE_USER=thomasharper
 # when the Hetzner alias changed from root to the configured user, then
 # re-pinned again after the fm/dotfiles-ssh-fragment-approach change replaced
 # programs.ssh with fragment symlinks + an Include-prepending activation
-# script in home.nix.
+# script in home.nix, then re-pinned again after adding the Linux-only
+# enableSshAgentLinger activation script (home.nix): even though its script
+# body is the empty string on Darwin (isDarwin branch), registering the
+# activation entry at all still shifts the generated activation script text,
+# so the drvPath moves even though nothing runs differently on macOS.
 # Update this only alongside a deliberate macOS-affecting change; an
 # unexpected mismatch means something meant to be Linux-only leaked into
 # the shared macOS evaluation.
-EXPECTED_DARWIN_DRVPATH="/nix/store/50xdh8icbkm5qyh90nrwmhlwbiaf8rl1-darwin-system-26.05.adda04f.drv"
+EXPECTED_DARWIN_DRVPATH="/nix/store/rvy57z4031ibgbwdznkpy8nqwrxim70h-darwin-system-26.05.adda04f.drv"
 
 test_darwin_drvpath_unchanged() {
   if ! command -v nix >/dev/null 2>&1; then
@@ -340,6 +344,21 @@ test_linux_ssh_agent_persists() {
   pass "services.ssh-agent is enabled with a systemd user unit for both Linux homeConfigurations outputs"
 }
 
+test_linux_ssh_agent_lingers_across_sessions() {
+  if ! command -v nix >/dev/null 2>&1; then
+    echo "skip: nix not found for ssh-agent linger check"
+    return 0
+  fi
+  local system script
+  for system in x86_64-linux aarch64-linux; do
+    script=$(cd "$ROOT" && nix eval --raw ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.activation.enableSshAgentLinger.data" 2>/dev/null) \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" enableSshAgentLinger activation script failed to evaluate"
+    assert_contains "$script" "loginctl enable-linger" \
+      "homeConfigurations.\"${FLAKE_USER}@${system}\" must run loginctl enable-linger on activation - without it, systemd-logind kills the ssh-agent systemd --user unit (and any cached key) as soon as the SSH session that ran rebuild closes, so a fresh SSH connection always gets an empty agent"
+  done
+  pass "enableSshAgentLinger activation script runs loginctl enable-linger for both Linux homeConfigurations outputs"
+}
+
 test_darwin_ssh_agent_not_duplicated() {
   if ! command -v nix >/dev/null 2>&1; then
     echo "skip: nix not found for darwin ssh-agent check"
@@ -363,4 +382,5 @@ test_linux_archive_tools_present_for_native_installers
 test_linux_native_install_fault_isolation
 test_darwin_native_install_absent
 test_linux_ssh_agent_persists
+test_linux_ssh_agent_lingers_across_sessions
 test_darwin_ssh_agent_not_duplicated
