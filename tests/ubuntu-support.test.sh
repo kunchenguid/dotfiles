@@ -319,6 +319,40 @@ test_darwin_native_install_absent() {
   pass "darwinConfigurations.mac has no installNativeTools activation script (herdr stays Homebrew-managed on macOS)"
 }
 
+test_linux_ssh_agent_persists() {
+  if ! command -v nix >/dev/null 2>&1; then
+    echo "skip: nix not found for ssh-agent persistence check"
+    return 0
+  fi
+  local system enabled
+  for system in x86_64-linux aarch64-linux; do
+    enabled=$(cd "$ROOT" && nix eval --json ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.services.ssh-agent.enable" 2>/dev/null) \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" services.ssh-agent.enable failed to evaluate"
+    [ "$enabled" = "true" ] \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" must enable services.ssh-agent so a key added once survives across shells on a minimal Ubuntu server with no gnome-keyring"
+
+    local unit
+    unit=$(cd "$ROOT" && nix eval --json ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.systemd.user.services.ssh-agent.Install.WantedBy" 2>/dev/null) \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" systemd user ssh-agent unit failed to evaluate"
+    assert_contains "$unit" "default.target" \
+      "homeConfigurations.\"${FLAKE_USER}@${system}\" ssh-agent systemd unit must start on login (WantedBy default.target) to survive across shells"
+  done
+  pass "services.ssh-agent is enabled with a systemd user unit for both Linux homeConfigurations outputs"
+}
+
+test_darwin_ssh_agent_not_duplicated() {
+  if ! command -v nix >/dev/null 2>&1; then
+    echo "skip: nix not found for darwin ssh-agent check"
+    return 0
+  fi
+  local enabled
+  enabled=$(cd "$ROOT" && nix eval --json ".#darwinConfigurations.mac.config.home-manager.users.${FLAKE_USER}.services.ssh-agent.enable" 2>/dev/null) \
+    || fail "darwinConfigurations.mac home-manager services.ssh-agent.enable failed to evaluate"
+  [ "$enabled" = "false" ] \
+    || fail "darwinConfigurations.mac must leave services.ssh-agent disabled - macOS already gets a persistent agent for free via launchd + Keychain (UseKeychain), enabling it here would run a redundant agent"
+  pass "services.ssh-agent stays disabled on darwinConfigurations.mac (macOS already has launchd + Keychain)"
+}
+
 test_darwin_drvpath_unchanged
 test_linux_home_configurations_evaluate
 test_linux_home_manager_cli_enabled
@@ -328,3 +362,5 @@ test_linux_native_install_tools_wired
 test_linux_archive_tools_present_for_native_installers
 test_linux_native_install_fault_isolation
 test_darwin_native_install_absent
+test_linux_ssh_agent_persists
+test_darwin_ssh_agent_not_duplicated

@@ -147,6 +147,15 @@ add the new `Include` lines. If you used the old
 `home/.ssh/config.private` file, copy its entries into
 `home/.ssh/dotfiles.config.private`; it is not renamed automatically.
 
+**Persistent ssh-agent (Linux only):** `home.nix` enables home-manager's
+`services.ssh-agent` on Linux, which runs a `systemd --user` unit that starts
+on login and lives until logout/reboot, with `SSH_AUTH_SOCK` wired into zsh
+automatically. Combined with `AddKeysToAgent yes` above, this means a key's
+passphrase only needs to be entered once per login/boot, even on a minimal
+server with no desktop environment or gnome-keyring. macOS is untouched -
+it already gets a persistent agent for free via launchd and the Keychain
+(`UseKeychain` above).
+
 **Git identity:** this config deliberately does not set your git name or email.
 Git will stop your first commit and tell you to set them (`git config --global user.name "Your Name"` and `git config --global user.email you@example.com`).
 If you'd rather manage that declaratively, add this back to `home.nix` with your own identity:

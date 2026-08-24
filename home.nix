@@ -230,6 +230,18 @@ in
   home.file.".config/opencode/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
 
+  # Linux-only: a persistent ssh-agent so AddKeysToAgent (above) has a
+  # long-lived agent to add keys to. Without this, a minimal Ubuntu server
+  # (no gnome-keyring, no desktop session) has no ssh-agent running at all,
+  # so every git/ssh invocation either starts its own throwaway agent with
+  # nothing cached or fails to find one, and the key passphrase is prompted
+  # every time. This starts a systemd --user service that lives across shells
+  # until logout/reboot, and home-manager wires SSH_AUTH_SOCK into
+  # programs.zsh automatically. macOS is unaffected (isDarwin = true there):
+  # it already gets a persistent agent for free via launchd + Keychain
+  # (UseKeychain above), so this would just add a redundant agent process.
+  services.ssh-agent.enable = !isDarwin;
+
   # ~/.ssh/config itself is NOT managed - Colima and other tools rewrite it
   # freely, and rebuild must never overwrite or regenerate it. Instead we
   # symlink two dotfiles-owned fragments and idempotently Include them (see
