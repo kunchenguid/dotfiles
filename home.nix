@@ -183,9 +183,16 @@ in
   # defaults load first and Colima/other tools can keep appending to the
   # bottom of the file untouched. Never touches existing content otherwise.
   home.activation.sshIncludeDotfilesFragments = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    ssh_config="$HOME/.ssh/config"
-    $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "$HOME/.ssh"
-    $DRY_RUN_CMD touch $VERBOSE_ARG "$ssh_config"
+    ssh_dir="$HOME/.ssh"
+    ssh_config="$ssh_dir/config"
+
+    if [ -n "''${DRY_RUN_CMD:-}" ]; then
+      $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "$ssh_dir"
+      [ -e "$ssh_config" ] || $DRY_RUN_CMD touch $VERBOSE_ARG "$ssh_config"
+    else
+      mkdir -p $VERBOSE_ARG "$ssh_dir"
+      touch $VERBOSE_ARG "$ssh_config"
+    fi
 
     # Reverse order: each prepend pushes the new line above existing
     # content, so prepending private then public leaves public on top -
@@ -194,11 +201,16 @@ in
       "Include ~/.ssh/dotfiles.config.private" \
       "Include ~/.ssh/dotfiles.config.public"
     do
-      if ! grep -qF "$include_line" "$ssh_config"; then
-        tmp="$(mktemp "$HOME/.ssh/config.XXXXXX")"
+      if ! [ -f "$ssh_config" ] || ! grep -qxF -- "$include_line" "$ssh_config"; then
+        if [ -n "''${DRY_RUN_CMD:-}" ]; then
+          $DRY_RUN_CMD prepend "$include_line" "$ssh_config"
+          continue
+        fi
+
+        tmp="$(mktemp "$ssh_dir/config.XXXXXX")"
         printf '%s\n' "$include_line" > "$tmp"
         cat "$ssh_config" >> "$tmp"
-        $DRY_RUN_CMD mv $VERBOSE_ARG "$tmp" "$ssh_config"
+        mv $VERBOSE_ARG "$tmp" "$ssh_config"
       fi
     done
   '';

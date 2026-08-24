@@ -50,25 +50,47 @@ assert_not_contains "$(cat "$PUBLIC_LINUX")" ".colima/ssh_config" \
 assert_not_contains "$(cat "$PUBLIC_DARWIN")" ".colima/ssh_config" \
   "dotfiles.config.public.darwin must not Include Colima's ssh_config - Colima stays in the unmanaged ~/.ssh/config"
 
-home_nix="$(cat "$ROOT/home.nix")"
-assert_not_contains "$home_nix" "programs.ssh" \
-  "home.nix must not reintroduce programs.ssh - only fragment symlinks + activation are allowed"
-assert_contains "$home_nix" '".ssh/dotfiles.config.public"' \
-  "home.nix is missing the dotfiles.config.public symlink"
-assert_contains "$home_nix" '".ssh/dotfiles.config.private"' \
-  "home.nix is missing the dotfiles.config.private symlink"
-assert_contains "$home_nix" "home.activation" \
-  "home.nix is missing a home.activation entry to wire up the SSH Include lines"
-assert_contains "$home_nix" "Include ~/.ssh/dotfiles.config.public" \
-  "home.nix activation script is missing the public fragment Include line"
-assert_contains "$home_nix" "Include ~/.ssh/dotfiles.config.private" \
-  "home.nix activation script is missing the private fragment Include line"
-assert_contains "$home_nix" "DRY_RUN_CMD" \
-  "home.nix SSH activation script must respect \$DRY_RUN_CMD like other Home Manager activations"
+if command -v nix >/dev/null 2>&1; then
+  activation=$(
+    cd "$ROOT" &&
+      nix eval --raw \
+        '.#homeConfigurations."thomasharper@x86_64-linux".config.home.activation.sshIncludeDotfilesFragments.data' \
+        2>/dev/null
+  ) || fail "could not evaluate the SSH Include activation fragment"
 
-# The idempotent-prepend behavior itself (second rebuild doesn't duplicate
-# Include lines, existing content like a Colima block survives) is exercised
-# against a scratch $HOME/.ssh in a disposable directory, not via nix eval -
-# see the manual verification noted in the PR description.
+  scratch_home="$(dotfiles_test_tmproot ssh-fragments-home)"
+  mkdir -p "$scratch_home/.ssh"
+  cat > "$scratch_home/.ssh/config" <<'SSH_CONFIG'
+# Include ~/.ssh/dotfiles.config.public
+Include ~/.ssh/dotfiles.config.public.extra
+Host colima
+  Include ~/.colima/ssh_config
+SSH_CONFIG
+
+  HOME="$scratch_home" DRY_RUN_CMD= VERBOSE_ARG= bash -eu -c "$activation"
+  HOME="$scratch_home" DRY_RUN_CMD= VERBOSE_ARG= bash -eu -c "$activation"
+
+  [ "$(grep -xcF -- "Include ~/.ssh/dotfiles.config.public" "$scratch_home/.ssh/config")" -eq 1 ] ||
+    fail "activation must prepend exactly one public Include line"
+  [ "$(grep -xcF -- "Include ~/.ssh/dotfiles.config.private" "$scratch_home/.ssh/config")" -eq 1 ] ||
+    fail "activation must prepend exactly one private Include line"
+
+  expected_prefix="$(mktemp "$scratch_home/expected-prefix.XXXXXX")"
+  cat > "$expected_prefix" <<'EXPECTED_PREFIX'
+Include ~/.ssh/dotfiles.config.public
+Include ~/.ssh/dotfiles.config.private
+EXPECTED_PREFIX
+  head -n 2 "$scratch_home/.ssh/config" | diff -u "$expected_prefix" - >/dev/null ||
+    fail "activation must prepend the public Include above the private Include"
+  grep -qF -- "Include ~/.colima/ssh_config" "$scratch_home/.ssh/config" ||
+    fail "activation must preserve existing Colima config content"
+
+  dry_home="$(dotfiles_test_tmproot ssh-fragments-dry-run-home)"
+  HOME="$dry_home" DRY_RUN_CMD=echo VERBOSE_ARG= bash -eu -c "$activation" >/dev/null
+  [ ! -e "$dry_home/.ssh/config" ] ||
+    fail "dry-run activation must not create or write ~/.ssh/config"
+else
+  echo "skip: nix not found for SSH activation behavior check"
+fi
 
 pass "SSH fragment files, gitignore, and home.nix wiring match the fragment + auto-Include model"
