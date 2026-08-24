@@ -155,7 +155,7 @@ If you don't use it, just remove its entry from `tools.nix` in your copy.
 | `updatePolicy` | Do I want the latest upstream version quickly?    | `stable` / `fast`             |
 | `isCask`       | If installed through Homebrew, is it a cask?      | `true` / omitted              |
 
-(`brewName`/`nixName` are optional overrides for when the Homebrew or nixpkgs name differs from the tool's `name`. `platform = "ubuntu"` isn't used by any entry yet - see below.)
+(`brewName`/`nixName` are optional overrides for when the Homebrew or nixpkgs name differs from the tool's `name`. `platform = "ubuntu"` is used by the `gcc`/`gnumake`/`pkg-config` build-toolchain entries, needed so nvim-treesitter can compile parsers on Ubuntu - macOS gets the same via Xcode Command Line Tools instead.)
 
 `tool-selection.nix` turns that table into concrete selections in two stages. `configuration.nix` consumes those selections for macOS `environment.systemPackages`, `homebrew.brews`, and `homebrew.casks`; `home.nix` consumes them for Ubuntu `home.packages`; and `nativeTools` records the Ubuntu tools that still need installer wiring. First, whether the tool exists on this machine at all:
 

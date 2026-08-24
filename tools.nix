@@ -29,6 +29,13 @@
   # nixpkgs ships this under the "libusb1" attribute.
   { name = "libusb"; scope = "personal"; platform = "all"; updatePolicy = "stable"; nixName = "libusb1"; }
 
+  # Ubuntu-only build toolchain: nvim-treesitter (main) shells out to `cc`,
+  # `make`, and `pkg-config` to compile parsers from source. macOS already
+  # has these via Xcode Command Line Tools, so this stays Linux-only.
+  { name = "gcc"; scope = "basic"; platform = "ubuntu"; updatePolicy = "stable"; }
+  { name = "gnumake"; scope = "basic"; platform = "ubuntu"; updatePolicy = "stable"; }
+  { name = "pkg-config"; scope = "basic"; platform = "ubuntu"; updatePolicy = "stable"; }
+
   # macOS-specific CLI toolchains for this personal Mac (no meaningful
   # Ubuntu equivalent through this same package name/manager).
   { name = "thefuck"; scope = "personal"; platform = "macos"; updatePolicy = "stable"; }

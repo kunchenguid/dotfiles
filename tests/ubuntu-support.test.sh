@@ -15,10 +15,14 @@ set -u
 FLAKE_USER=thomasharper
 
 # Pinned at the moment Ubuntu support was layered on top of the tools.nix
-# refactor (PR #17, merged as 51fe4b7). Update this only alongside a
-# deliberate macOS-affecting change; an unexpected mismatch means something
-# meant to be Linux-only leaked into the shared macOS evaluation.
-EXPECTED_DARWIN_DRVPATH="/nix/store/182wiayrj1rg3csnylcyjsfsmzsplmrp-darwin-system-26.05.adda04f.drv"
+# refactor (PR #17, merged as 51fe4b7), then re-pinned after PR #20
+# (hetzner-alias, merged as 9aac04f) added lines to home.nix's shared
+# initContent string without bumping this constant, which drifted the
+# pin stale even though that PR made no Ubuntu-support change. Update this
+# only alongside a deliberate macOS-affecting change; an unexpected mismatch
+# means something meant to be Linux-only leaked into the shared macOS
+# evaluation.
+EXPECTED_DARWIN_DRVPATH="/nix/store/ny4b145bp5rs40fx2qa4r9phk73ym80z-darwin-system-26.05.adda04f.drv"
 
 test_darwin_drvpath_unchanged() {
   if ! command -v nix >/dev/null 2>&1; then
@@ -62,6 +66,25 @@ test_linux_home_manager_cli_enabled() {
   pass "home-manager CLI is installed by both Linux homeConfigurations outputs"
 }
 
+test_linux_treesitter_buildtools_present() {
+  if ! command -v nix >/dev/null 2>&1; then
+    echo "skip: nix not found for Linux build-toolchain check"
+    return 0
+  fi
+  local system names pkg
+  for system in x86_64-linux aarch64-linux; do
+    names=$(cd "$ROOT" && nix eval --json ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.packages" \
+      --apply 'pkgs: map (p: p.pname or p.name) pkgs' 2>/dev/null) \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" home.packages failed to evaluate"
+    for pkg in gcc-wrapper gnumake pkg-config-wrapper; do
+      assert_contains "$names" "\"$pkg\"" \
+        "homeConfigurations.\"${FLAKE_USER}@${system}\" is missing $pkg (needed for nvim-treesitter parser compilation: cc/make/pkg-config)"
+    done
+  done
+  pass "gcc, make, and pkg-config are wired into home.packages for both Linux homeConfigurations outputs"
+}
+
 test_darwin_drvpath_unchanged
 test_linux_home_configurations_evaluate
 test_linux_home_manager_cli_enabled
+test_linux_treesitter_buildtools_present
