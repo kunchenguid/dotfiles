@@ -224,6 +224,8 @@ test_linux_archive_tools_present_for_native_installers() {
       | sed -E 's#.*curl -fsSL https://pi\.dev/install\.sh.*#:#')
 
     if [ "$system" = "$current_system" ]; then
+      nix build --no-link "$gnutar_path" "$gzip_path" >/dev/null 2>&1 \
+        || fail "failed to realize pkgs.gnutar and pkgs.gzip for executable archive-tools check on $system"
       tmp_home=$(dotfiles_test_tmproot "dotfiles-gnutar-path-$system")
       empty_path="$tmp_home/empty-path"
       mkdir -p "$empty_path" "$tmp_home/archive-src"
