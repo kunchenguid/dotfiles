@@ -186,7 +186,7 @@ test_linux_gnutar_present_for_native_installers() {
   # ubuntu:22.04, which happens to ship tar and can mask this in testing.
   # gnutar must be Nix-managed (home.packages) and wired into
   # installNativeTools' own curated PATH export, not just assumed present.
-  local system names data
+  local system names data gnutar_path patched tmp_home empty_path out exit_code
   for system in x86_64-linux aarch64-linux; do
     names=$(cd "$ROOT" && nix eval --json ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.packages" \
       --apply 'pkgs: map (p: p.pname or p.name) pkgs' 2>/dev/null) \
@@ -196,8 +196,28 @@ test_linux_gnutar_present_for_native_installers() {
 
     data=$(cd "$ROOT" && nix eval --raw ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.activation.installNativeTools.data" 2>/dev/null) \
       || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools activation script failed to evaluate"
-    assert_contains "$data" "gnutar" \
-      "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools does not put gnutar on its curated PATH export"
+    gnutar_path=$(cd "$ROOT" && nix eval --raw --impure --expr "
+      let
+        flake = builtins.getFlake \"path:$ROOT\";
+        pkgs = import flake.inputs.nixpkgs { system = \"$system\"; };
+      in pkgs.gnutar
+    " 2>/dev/null) \
+      || fail "pkgs.gnutar failed to evaluate for $system"
+
+    patched=$(printf '%s\n' "$data" \
+      | sed -E 's#.*curl -fsSL https://claude\.ai/install\.sh.*#:#' \
+      | sed -E "s#.*curl -fsSL https://chatgpt\.com/codex/install\.sh.*#resolved_tar=\\\$(command -v tar) \&\& [ \"\\\$resolved_tar\" = \"$gnutar_path/bin/tar\" ] || { echo \"tar resolved to \\\${resolved_tar:-missing}, expected $gnutar_path/bin/tar\" >&2; exit 1; }#" \
+      | sed -E 's#.*curl -fsSL https://herdr\.dev/install\.sh.*#:#' \
+      | sed -E 's#.*npm install -g skills.*#:#' \
+      | sed -E 's#.*curl -fsSL https://pi\.dev/install\.sh.*#:#')
+
+    tmp_home=$(dotfiles_test_tmproot "dotfiles-gnutar-path-$system")
+    empty_path="$tmp_home/empty-path"
+    mkdir -p "$empty_path"
+    out=$(HOME="$tmp_home" PATH="$empty_path" /bin/bash -eu -o pipefail -c "$patched" 2>&1)
+    exit_code=$?
+    [ "$exit_code" -eq 0 ] \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools must resolve tar from its own curated PATH as $gnutar_path/bin/tar with ambient PATH stripped (exit $exit_code), got: $out"
   done
   pass "gnutar is Nix-managed and wired into installNativeTools' PATH for both Linux homeConfigurations outputs"
 }
