@@ -186,7 +186,7 @@ test_linux_archive_tools_present_for_native_installers() {
   # ubuntu:22.04, which happens to ship tar and can mask this in testing.
   # gnutar and gzip must be Nix-managed (home.packages) and wired into
   # installNativeTools' own curated PATH export, not just assumed present.
-  local current_system system names data gnutar_path gzip_path patched tmp_home empty_path fixture out exit_code ran_archive_check
+  local current_system system names data gnutar_path gzip_path coreutils_path patched tmp_home empty_path fixture out exit_code ran_archive_check
   current_system=$(nix eval --raw --impure --expr builtins.currentSystem 2>/dev/null) \
     || fail "builtins.currentSystem failed to evaluate"
   ran_archive_check=false
@@ -215,6 +215,13 @@ test_linux_archive_tools_present_for_native_installers() {
       in pkgs.gzip
     " 2>/dev/null) \
       || fail "pkgs.gzip failed to evaluate for $system"
+    coreutils_path=$(cd "$ROOT" && nix eval --raw --impure --expr "
+      let
+        flake = builtins.getFlake \"path:$ROOT\";
+        pkgs = import flake.inputs.nixpkgs { system = \"$system\"; };
+      in pkgs.coreutils
+    " 2>/dev/null) \
+      || fail "pkgs.coreutils failed to evaluate for $system"
 
     patched=$(printf '%s\n' "$data" \
       | sed -E 's#.*curl -fsSL https://claude\.ai/install\.sh.*#:#' \
@@ -224,8 +231,8 @@ test_linux_archive_tools_present_for_native_installers() {
       | sed -E 's#.*curl -fsSL https://pi\.dev/install\.sh.*#:#')
 
     if [ "$system" = "$current_system" ]; then
-      nix build --no-link "$gnutar_path" "$gzip_path" >/dev/null 2>&1 \
-        || fail "failed to realize pkgs.gnutar and pkgs.gzip for executable archive-tools check on $system"
+      nix build --no-link "$gnutar_path" "$gzip_path" "$coreutils_path" >/dev/null 2>&1 \
+        || fail "failed to realize pkgs.gnutar, pkgs.gzip, and pkgs.coreutils for executable archive-tools check on $system"
       tmp_home=$(dotfiles_test_tmproot "dotfiles-gnutar-path-$system")
       empty_path="$tmp_home/empty-path"
       mkdir -p "$empty_path" "$tmp_home/archive-src"
