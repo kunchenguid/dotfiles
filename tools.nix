@@ -1,8 +1,9 @@
 # Single source of truth for CLI/GUI tool metadata, shared by macOS
-# (Homebrew + Nix) and, later, Linux/Ubuntu selection logic.
+# (Homebrew + Nix) and Ubuntu (Nix + native installers).
 #
 # Field reference and selection-logic docs: README.md ("Package metadata").
-# Selection logic that reads this table lives in configuration.nix.
+# Selection logic that reads this table lives in ./tool-selection.nix,
+# consumed by configuration.nix (macOS) and home.nix (Ubuntu).
 [
   # Fast-moving CLI agents wanted on every machine - track upstream closely,
   # so Homebrew rather than a pinned nixpkgs version.
@@ -22,8 +23,7 @@
   { name = "wget"; scope = "basic"; platform = "all"; updatePolicy = "stable"; }
   { name = "cmake"; scope = "basic"; platform = "all"; updatePolicy = "stable"; }
 
-  # Stable CLI tooling only this personal Mac needs, but not OS-specific -
-  # would apply equally on a future personal Ubuntu machine.
+  # Stable CLI tooling only personal machines need, but not OS-specific.
   { name = "ffmpeg"; scope = "personal"; platform = "all"; updatePolicy = "stable"; }
   { name = "lcov"; scope = "personal"; platform = "all"; updatePolicy = "stable"; }
   # nixpkgs ships this under the "libusb1" attribute.

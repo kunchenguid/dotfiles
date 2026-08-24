@@ -4,6 +4,7 @@ Watch the walkthrough: https://youtu.be/5N-okeDdIuI
 
 My personal Mac setup, managed with nix-darwin and home-manager.
 One repo, one command, and a fresh Mac ends up configured the same way every time.
+It also supports a bare Ubuntu 22.04 LTS machine via standalone home-manager - see "Ubuntu setup" below.
 
 ## Contributing / Using This Repo
 
@@ -13,7 +14,7 @@ If you find a bug, please open a GitHub Issue using the bug report template.
 
 ## What you get
 
-Running the switch builds:
+On macOS, running the switch builds:
 
 - System settings (dark mode, key repeat, dock, Finder, trackpad)
 - Homebrew apps (casks and CLI tools)
@@ -24,11 +25,14 @@ Running the switch builds:
 - Agent configs (Claude, Codex, opencode all share one AGENTS.md)
 - Optional Pi theme and local extensions, generic UI settings and model overrides, plus two deliberately pinned third-party Pi packages
 
+Ubuntu gets the shared shell, CLI packages, prompt, git, and symlinked dotfiles; see "Ubuntu setup" for the narrower Linux surface.
+
 ## Prerequisites
 
 - Apple Silicon Mac, by default.
 - Intel Mac: change one line.
   In `configuration.nix`, set `nixpkgs.hostPlatform = "x86_64-darwin";` (the comment right there tells you the same thing).
+- Ubuntu 22.04 LTS ("base free" - a plain install, no desktop environment) also works; see "Ubuntu setup" below instead of the macOS steps that follow.
 
 ## Fresh-machine setup
 
@@ -69,7 +73,7 @@ nix flake check --no-build
 nix build .#darwinConfigurations.mac.system --dry-run
 ```
 
-If you renamed the host label in "Make it yours", substitute your label for `mac` in these commands.
+If you renamed the host label in "Make it yours", substitute your label for `mac` in these commands. On Ubuntu, substitute `.#homeConfigurations."<user>@<system>".activationPackage` (e.g. `thomasharper@x86_64-linux`) for the `darwinConfigurations.mac.system` output.
 
 ## Daily use
 
@@ -82,15 +86,29 @@ Edit the config files in place, then apply:
 That's it.
 No separate build-and-copy step.
 
+## Ubuntu setup
+
+Ubuntu 22.04 LTS ("base free" - a plain install, no desktop environment, nothing pre-configured) is supported through a separate, simpler path: standalone home-manager, not nix-darwin. After Nix is installed, the managed config is user-level only: no sudo rebuild, no Homebrew, no system-level config - just your shell, git, starship, zoxide, and the symlinked dotfiles under `home/`.
+
+```sh
+git clone https://github.com/kunchenguid/dotfiles.git
+cd dotfiles
+./bootstrap.sh
+```
+
+On Linux, `bootstrap.sh` does four things: installs Determinate Nix (same installer as macOS), symlinks this repo to `~/.dotfiles`, offers to fix the `user` line in `flake.nix` if it doesn't match your Ubuntu username, then runs the first `home-manager switch --flake ~/.dotfiles#<user>@<system>` (pinned to the home-manager `release-26.05` branch, same pattern as the macOS `darwin-rebuild` bootstrap). `<system>` is `x86_64-linux` or `aarch64-linux`, detected from `uname -m`. After that, `./rebuild.sh` works the same way it does on macOS.
+
+What you get is intentionally narrower than the macOS setup: no Homebrew casks/GUI apps (there's no desktop environment to run them), and no macOS-only CLI tools (`thefuck`, `echidna`, `solc-select`, `tenderly`, `postgresql`, `libpq`, `colima` - see `tools.nix`'s `platform = "macos"` entries). Fast-moving `platform = "all"` tools (`claude-code`, `codex`, `herdr`, `skills`, `pi-coding-agent`) are also not yet installed automatically on Ubuntu - `tool-selection.nix`'s `useNative` correctly identifies them as needing a non-Nix installer (see "Package metadata" below), but that installer isn't wired up yet; install them manually per their own docs for now.
+
 ## Make it yours
 
 This repo is mine.
 If you clone it, review these before you run `bootstrap.sh`:
 
-- **Username**: run `./bootstrap.sh` (it detects your macOS username and offers to set it) OR change the single `user = "kunchen"` line in `flake.nix`.
+- **Username**: run `./bootstrap.sh` (it detects your username and offers to set it) OR change the single `user = "kunchen"` line in `flake.nix`.
   Everything else (`configuration.nix`, `home.nix`, home directory paths) is threaded from that one variable.
 - **Host label**: change the single `hostLabel = "mac";` line in `flake.nix` (`rebuild.sh`/`bootstrap.sh` read it back out, so nothing else needs editing).
-- **CPU architecture**, `hostPlatform` in `configuration.nix` (see Prerequisites above).
+- **CPU architecture**: on macOS, set `hostPlatform` in `configuration.nix` (see Prerequisites above); on Ubuntu, `bootstrap.sh` and `rebuild.sh` map `uname -m` to `x86_64-linux` or `aarch64-linux`.
 
 **Git identity:** this config deliberately does not set your git name or email.
 Git will stop your first commit and tell you to set them (`git config --global user.name "Your Name"` and `git config --global user.email you@example.com`).
@@ -107,9 +125,9 @@ programs.git = {
 ```
 
 **Homebrew cleanup warning:** `configuration.nix` sets `homebrew.onActivation.cleanup = "zap"`.
-That means every time you switch, Homebrew removes any package or cask on your machine that isn't listed in the `brews` and `casks` arrays in `configuration.nix`.
+That means every time you switch on macOS, Homebrew removes any package or cask on your machine that isn't selected from `tools.nix` into `configuration.nix`'s `homebrew.brews` and `homebrew.casks`.
 If you already have Homebrew stuff installed that isn't in that list, the first switch will uninstall it.
-Read through `brews` and `casks` before you run `bootstrap.sh` or `rebuild.sh` for the first time, and add anything you want to keep.
+Read through the Homebrew-selected entries in `tools.nix` before you run `bootstrap.sh` or `rebuild.sh` for the first time, and add anything you want to keep.
 
 **Existing Homebrew install:** `configuration.nix` sets `nix-homebrew.autoMigrate = true`, so if `/opt/homebrew` already has a non-Nix Homebrew install on it (common on a Mac you were already using), the first switch migrates it in place under nix-homebrew's management instead of erroring out. Your existing taps and packages are kept; the `zap` cleanup above still applies on top of that.
 
@@ -119,7 +137,7 @@ Without this setting, home-manager refuses to activate rather than clobber them.
 With it, the first switch moves each conflicting file to `<name>.before-home-manager` next to it and links in this repo's version instead - diff the two afterward if you want to carry anything over.
 
 **About `herdr`:** it's a `scope = "basic"` entry in `tools.nix`.
-It's a real public Homebrew formula (`brew info herdr` finds it in homebrew-core, no tap needed), so it will install fine.
+It's a real public Homebrew formula (`brew info herdr` finds it in homebrew-core, no tap needed), so it will install fine on macOS.
 If you don't use it, just remove its entry from `tools.nix` in your copy.
 
 **Package metadata:** `tools.nix` is the single source of truth for every CLI tool and GUI app. Each entry answers four questions:
@@ -133,7 +151,7 @@ If you don't use it, just remove its entry from `tools.nix` in your copy.
 
 (`brewName`/`nixName` are optional overrides for when the Homebrew or nixpkgs name differs from the tool's `name`. `platform = "ubuntu"` isn't used by any entry yet - see below.)
 
-`configuration.nix` turns that table into `environment.systemPackages`, `homebrew.brews`, and `homebrew.casks` in two stages. First, whether the tool exists on this machine at all:
+`tool-selection.nix` turns that table into concrete selections in two stages. `configuration.nix` consumes those selections for macOS `environment.systemPackages`, `homebrew.brews`, and `homebrew.casks`; `home.nix` consumes them for Ubuntu `home.packages`; and `nativeTools` records the Ubuntu tools that still need installer wiring. First, whether the tool exists on this machine at all:
 
 ```text
 scope:
@@ -146,24 +164,26 @@ platform:
   anything else            -> skip
 ```
 
-Only then is the installer picked, based on `currentPlatform` (hardcoded to `"macos"` today - no OS detection or Ubuntu bootstrap logic exists yet):
+Only then is the installer picked, based on `currentPlatform`:
 
 ```text
-macOS (active today):
+macOS:
   stable + all   -> Nix
   fast + all     -> Homebrew
   macos-only     -> Homebrew
 
-Ubuntu (future, not implemented):
+Ubuntu:
   stable + all     -> Nix
-  fast + all       -> native installer
+  fast + all       -> native installer (not yet wired up - see "Ubuntu setup")
   stable + ubuntu  -> Nix
-  fast + ubuntu    -> native installer
+  fast + ubuntu    -> native installer (not yet wired up)
 ```
 
-The invariant that makes this Ubuntu-ready without a later reorg: installer selection always depends on `currentPlatform`, not on a tool's fields alone. A `platform=all; updatePolicy=fast` tool is Homebrew-managed only because `currentPlatform == "macos"` right now - on a future Ubuntu machine that same tool would go through a native installer instead. A `platform=ubuntu` tool can never enter the Homebrew lists while `currentPlatform == "macos"`. `isCask` only decides `homebrew.casks` vs `homebrew.brews` for a tool the platform stage already selected for Homebrew - it plays no role in which installer is chosen. See `isEnabled`/`isForCurrentPlatform`/`useNix`/`useHomebrew`/`useNative` in `configuration.nix` for the exact predicates.
+`currentPlatform` isn't one global constant: `configuration.nix` hardcodes it to `"macos"` (there's only one macOS target), while each Ubuntu `homeConfigurations."<user>@<system>"` output in `home.nix` derives it from `pkgs.stdenv.isDarwin`, so it's correct per-output rather than a single file-level toggle that would only ever be right for one platform at a time.
 
-One toggle controls both scopes: flip `usePersonalSetup` in `flake.nix` to `false` for dev tooling only - handy for a second, non-personal machine (e.g. a server). Still macOS-only.
+The invariant that keeps the macOS and Ubuntu paths aligned: installer selection always depends on `currentPlatform`, not on a tool's fields alone. A `platform=all; updatePolicy=fast` tool is Homebrew-managed only because `currentPlatform == "macos"` - on Ubuntu that same tool goes through `useNative` (a native installer) instead. A `platform=ubuntu` tool can never enter the Homebrew lists while `currentPlatform == "macos"`. `isCask` only decides `homebrew.casks` vs `homebrew.brews` for a tool the platform stage already selected for Homebrew - it plays no role in which installer is chosen. See `isEnabled`/`isForCurrentPlatform`/`useNix`/`useHomebrew`/`useNative` in `tool-selection.nix` (shared by `configuration.nix` and `home.nix`) for the exact predicates.
+
+One toggle controls both scopes: flip `usePersonalSetup` in `flake.nix` to `false` for dev tooling only - handy for a second, non-personal machine (e.g. a server).
 
 **Heads-up:**
 
@@ -175,11 +195,12 @@ One toggle controls both scopes: flip `usePersonalSetup` in `flake.nix` to `fals
 ## Repo tour
 
 - `flake.nix` - the entry point.
-  Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew, and declares the `hostLabel` machine; `usePersonalSetup` selects its brews/casks profile.
-- `configuration.nix` - system-level config: macOS defaults, Homebrew, and package selection logic (see "Package metadata" above).
-- `tools.nix` - the per-tool metadata table that `configuration.nix` selects packages from.
-- `home.nix` - user-level config: shell, packages, prompt, and the symlinks described below.
-- `rebuild.sh` - re-applies the config after the first switch.
+  Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew for the macOS `darwinConfigurations.mac` output, and nixpkgs + home-manager (standalone, no nix-darwin) for the Linux `homeConfigurations."<user>@<system>"` outputs; `usePersonalSetup` selects the brews/casks/Nix-package profile on both.
+- `configuration.nix` - macOS-only system-level config: system defaults, Homebrew, and macOS package selection (see "Package metadata" above).
+- `tools.nix` - the per-tool metadata table every platform selects packages from.
+- `tool-selection.nix` - the shared `isEnabled`/`isForCurrentPlatform`/`useNix`/`useHomebrew`/`useNative` predicates that turn `tools.nix` into concrete package lists for one `currentPlatform`; used by both `configuration.nix` (macOS) and `home.nix` (Ubuntu).
+- `home.nix` - user-level config: shell, packages, prompt, and the symlinks described below. Shared between macOS and Ubuntu; platform-specific bits (home directory, Nix-managed package list, a couple of aliases) branch on `pkgs.stdenv.isDarwin`.
+- `rebuild.sh` - re-applies the config after the first switch (macOS or Ubuntu).
   Run this every time you make a change.
 - `home/` - the actual config files that get symlinked into place; the sections below explain the shared symlink model and Pi's narrower selective setup.
 

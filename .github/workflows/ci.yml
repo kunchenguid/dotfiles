@@ -21,6 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
+
       - name: Run tests/*.test.sh
         run: |
           for t in tests/*.test.sh; do
