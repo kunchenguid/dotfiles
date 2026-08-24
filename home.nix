@@ -230,8 +230,8 @@ in
   home.file.".config/opencode/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
 
-  # Linux-only: a persistent ssh-agent so AddKeysToAgent (above) has a
-  # long-lived agent to add keys to. Without this, a minimal Ubuntu server
+  # Linux-only: a persistent ssh-agent so AddKeysToAgent in the SSH fragments
+  # has a long-lived agent to add keys to. Without this, a minimal Ubuntu server
   # (no gnome-keyring, no desktop session) has no ssh-agent running at all,
   # so every git/ssh invocation either starts its own throwaway agent with
   # nothing cached or fails to find one, and the key passphrase is prompted
