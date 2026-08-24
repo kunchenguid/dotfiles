@@ -243,11 +243,7 @@ You only run `./rebuild.sh` when you change something that isn't just a symlinke
 
 ## Optional Pi configuration
 
-Pi is an opt-in CLI, not a dependency this repository vendors. Install it from its owner with the [official Pi instructions](https://pi.dev), for example:
-
-```sh
-npm install -g --ignore-scripts @earendil-works/pi-coding-agent
-```
+Pi is an opt-in CLI, not a dependency this repository vendors. The CLI itself is selected through `tools.nix` like the other managed tools; see "Package metadata" for how macOS and Ubuntu choose its installer. If you adapt only this Pi config without the package metadata, install Pi from its owner with the [official Pi instructions](https://pi.dev).
 
 [Pi Launcher](https://github.com/kunchenguid/homebrew-tap) is also optional and installed from its owner, not declared by this config:
 
@@ -274,7 +270,7 @@ The version and commit are immutable pins, so Pi does not move them during packa
 
 Both packages execute with your full user permissions and must be trusted like any other executable code. The compaction package is experimental, sends the relevant OpenAI compaction and continuity data to OpenAI, and upstream declares the stale peer range `>=0.80.9 <0.81.0`; this exact immutable ref was locally proven to load and perform remote compaction on Pi 0.82.0. Do not treat that proof as a guarantee for a different Pi version or a different package ref.
 
-Home Manager deliberately does not manage `~/.pi/agent` itself, or Pi authentication, sessions, trust decisions, caches, npm/git package trees, or any other runtime state. The model overrides contain no credentials or endpoint settings, do not choose a default model, and only take effect after you authenticate Pi yourself. This remains an additive post-video layer: it does not install Pi, a launcher, or package source code into this repository.
+Home Manager deliberately does not manage `~/.pi/agent` itself, or Pi authentication, sessions, trust decisions, caches, npm/git package trees, or any other runtime state. The model overrides contain no credentials or endpoint settings, do not choose a default model, and only take effect after you authenticate Pi yourself. This remains an additive post-video layer: it does not vendor Pi, a launcher, or package source code into this repository.
 
 ## Notes
 
