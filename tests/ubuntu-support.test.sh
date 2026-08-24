@@ -18,12 +18,13 @@ FLAKE_USER=thomasharper
 # refactor (PR #17, merged as 51fe4b7), then re-pinned after deliberate
 # macOS-affecting changes to shared Home Manager zsh initContent, most recently
 # when the Hetzner alias changed from root to the configured user, then
-# re-pinned again after the fm/dotfiles-manage-ssh-config change added
-# programs.ssh to home.nix.
+# re-pinned again after the fm/dotfiles-ssh-fragment-approach change replaced
+# programs.ssh with fragment symlinks + an Include-prepending activation
+# script in home.nix.
 # Update this only alongside a deliberate macOS-affecting change; an
 # unexpected mismatch means something meant to be Linux-only leaked into
 # the shared macOS evaluation.
-EXPECTED_DARWIN_DRVPATH="/nix/store/64mxixgfch5nbvvmkm5vsi41j3qjy237-darwin-system-26.05.adda04f.drv"
+EXPECTED_DARWIN_DRVPATH="/nix/store/kb9rsb2fylavzvb07qw5z8vb7plmp95f-darwin-system-26.05.adda04f.drv"
 
 test_darwin_drvpath_unchanged() {
   if ! command -v nix >/dev/null 2>&1; then

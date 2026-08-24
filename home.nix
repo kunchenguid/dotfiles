@@ -111,36 +111,6 @@ in
     };
   };
 
-  # Safe, general SSH defaults live here declaratively. Per-host entries with
-  # real hostnames/IPs/usernames stay in the gitignored home/.ssh/config.private
-  # (copy from config.private.example) - see README.md "Private SSH hosts".
-  programs.ssh = {
-    enable = true;
-    enableDefaultConfig = false;
-    includes = [ "${dotfiles}/home/.ssh/config.private" ]
-      ++ lib.optional isDarwin "${config.home.homeDirectory}/.colima/ssh_config";
-    settings = {
-      "github.com" = {
-        AddKeysToAgent = "yes";
-        IdentitiesOnly = true;
-        IdentityFile = "~/.ssh/id_rsa";
-      } // lib.optionalAttrs isDarwin { UseKeychain = "yes"; };
-      "*" = {
-        AddKeysToAgent = "yes";
-        Compression = false;
-        ControlMaster = "no";
-        ControlPath = "~/.ssh/master-%r@%n:%p";
-        ControlPersist = "no";
-        ForwardAgent = false;
-        HashKnownHosts = false;
-        IdentitiesOnly = true;
-        ServerAliveCountMax = 3;
-        ServerAliveInterval = 0;
-        UserKnownHostsFile = "~/.ssh/known_hosts";
-      };
-    };
-  };
-
   programs.zoxide = {
     enable = true;
     options = [ "--cmd" "cd" ];
@@ -193,4 +163,43 @@ in
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
   home.file.".config/opencode/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
+
+  # ~/.ssh/config itself is NOT managed - Colima and other tools rewrite it
+  # freely, and rebuild must never overwrite or regenerate it. Instead we
+  # symlink two dotfiles-owned fragments and idempotently Include them (see
+  # activation script below). Safe cross-machine defaults live in the
+  # committed, per-platform dotfiles.config.public.{darwin,linux}; per-host
+  # secrets live in the gitignored dotfiles.config.private (copy from
+  # dotfiles.config.private.example) - see README.md "Private SSH hosts".
+  home.file.".ssh/dotfiles.config.public".source =
+    config.lib.file.mkOutOfStoreSymlink
+      "${dotfiles}/home/.ssh/dotfiles.config.public.${if isDarwin then "darwin" else "linux"}";
+  home.file.".ssh/dotfiles.config.private".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.ssh/dotfiles.config.private";
+
+  # Prepend Include lines for the two fragments above into ~/.ssh/config if
+  # they aren't already there, so a fresh machine gets them wired in on the
+  # first rebuild with no manual paste. Prepended (not appended) so dotfiles
+  # defaults load first and Colima/other tools can keep appending to the
+  # bottom of the file untouched. Never touches existing content otherwise.
+  home.activation.sshIncludeDotfilesFragments = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    ssh_config="$HOME/.ssh/config"
+    $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "$HOME/.ssh"
+    $DRY_RUN_CMD touch $VERBOSE_ARG "$ssh_config"
+
+    # Reverse order: each prepend pushes the new line above existing
+    # content, so prepending private then public leaves public on top -
+    # the order the two Includes are meant to appear in.
+    for include_line in \
+      "Include ~/.ssh/dotfiles.config.private" \
+      "Include ~/.ssh/dotfiles.config.public"
+    do
+      if ! grep -qF "$include_line" "$ssh_config"; then
+        tmp="$(mktemp "$HOME/.ssh/config.XXXXXX")"
+        printf '%s\n' "$include_line" > "$tmp"
+        cat "$ssh_config" >> "$tmp"
+        $DRY_RUN_CMD mv $VERBOSE_ARG "$tmp" "$ssh_config"
+      fi
+    done
+  '';
 }
