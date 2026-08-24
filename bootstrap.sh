@@ -109,6 +109,29 @@ else
   # rebuild.sh calls the installed `home-manager` command directly.
   nix run github:nix-community/home-manager/release-26.05 -- \
     switch --flake ~/.dotfiles#"${FLAKE_USER}@${LINUX_SYSTEM}"
+
+  echo "==> Step 5: make zsh the login shell"
+  # home.nix configures programs.zsh and nothing else, so on a box that still
+  # logs you into /bin/bash none of it is ever sourced: no aliases, and - the
+  # one that actually bites - no SSH_AUTH_SOCK, because home-manager's
+  # services.ssh-agent module only injects that export into the shells it
+  # manages. The systemd ssh-agent runs, but bash can't see it, so every
+  # git pull re-prompts for the key passphrase. macOS already logs into zsh,
+  # hence Linux-only. This is the one step here that needs sudo.
+  ZSH_BIN="$HOME/.nix-profile/bin/zsh"
+  CURRENT_SHELL="$(getent passwd "$REAL_USER" | cut -d: -f7)"
+  if [ "$CURRENT_SHELL" = "$ZSH_BIN" ]; then
+    echo "    already $ZSH_BIN, nothing to do"
+  elif ! "$ZSH_BIN" -lc 'exit 0' >/dev/null 2>&1; then
+    # Never chsh to a shell that doesn't run: sshd hands you your login shell
+    # and nothing else, so a bad one locks you out of the machine entirely.
+    echo "    WARNING: $ZSH_BIN does not start - leaving the login shell as $CURRENT_SHELL" >&2
+  else
+    # chsh rejects any shell missing from /etc/shells.
+    grep -qxF "$ZSH_BIN" /etc/shells || echo "$ZSH_BIN" | sudo tee -a /etc/shells >/dev/null
+    sudo chsh -s "$ZSH_BIN" "$REAL_USER"
+    echo "    login shell is now $ZSH_BIN - open a new SSH session to pick it up"
+  fi
 fi
 
 echo "==> Done. Use ./rebuild.sh for future changes."

@@ -372,6 +372,78 @@ test_darwin_ssh_agent_not_duplicated() {
   pass "services.ssh-agent stays disabled on darwinConfigurations.mac (macOS already has launchd + Keychain)"
 }
 
+# Extracts bootstrap.sh's Linux-only login-shell block (ZSH_BIN=... through its
+# closing fi) and runs it against stubbed getent/chsh/sudo, so the guard that
+# keeps a non-starting shell out of /etc/passwd is exercised, not just grepped.
+run_bootstrap_login_shell_block() {
+  local home=$1 current_shell=$2 zsh_runs=$3 log=$4 block stub
+  block=$(awk '/^  ZSH_BIN=/,/^  fi$/' "$ROOT/bootstrap.sh")
+  [ -n "$block" ] || fail "bootstrap.sh no longer contains the ZSH_BIN login-shell block"
+
+  stub="$home/stubs"
+  mkdir -p "$stub" "$home/.nix-profile/bin"
+  printf '#!/bin/sh\necho "dotfiles-test:x:1000:1000::%s:%s"\n' "$home" "$current_shell" > "$stub/getent"
+  printf '#!/bin/sh\nprintf "chsh %%s\\n" "$*" >> "%s"\n' "$log" > "$stub/chsh"
+  printf '#!/bin/sh\nprintf "sudo %%s\\n" "$*" >> "%s"\n' "$log" > "$stub/sudo"
+  chmod +x "$stub/getent" "$stub/chsh" "$stub/sudo"
+
+  if [ "$zsh_runs" = yes ]; then
+    printf '#!/bin/sh\nexit 0\n' > "$home/.nix-profile/bin/zsh"
+  else
+    printf '#!/bin/sh\nexit 1\n' > "$home/.nix-profile/bin/zsh"
+  fi
+  chmod +x "$home/.nix-profile/bin/zsh"
+
+  HOME="$home" REAL_USER=dotfiles-test PATH="$stub:$PATH" \
+    bash -c "$block" 2>&1
+}
+
+test_bootstrap_sets_zsh_login_shell_on_linux() {
+  # home.nix enables programs.zsh only, and home-manager's services.ssh-agent
+  # module injects SSH_AUTH_SOCK into just the shells it manages. Ubuntu leaves
+  # the login shell as /bin/bash, so the agent runs but no shell ever learns
+  # its socket and every git pull re-prompts for the key passphrase. bootstrap.sh
+  # has to move the login shell to the Nix zsh, or the whole zsh config is dead.
+  local home log out
+
+  home=$(dotfiles_test_tmproot dotfiles-login-shell-switch)
+  log="$home/calls"
+  out=$(run_bootstrap_login_shell_block "$home" /bin/bash yes "$log")
+  assert_contains "$(cat "$log" 2>/dev/null)" "chsh -s $home/.nix-profile/bin/zsh dotfiles-test" \
+    "bootstrap.sh must chsh a /bin/bash user to the Nix zsh, otherwise SSH_AUTH_SOCK never reaches the login shell (got: $out)"
+  assert_contains "$(cat "$log" 2>/dev/null)" "/etc/shells" \
+    "bootstrap.sh must add the Nix zsh to /etc/shells first - chsh rejects any shell missing from it (got: $out)"
+
+  # The lockout guard: sshd hands you your login shell and nothing else, so a
+  # shell that does not start makes the machine unreachable over SSH.
+  home=$(dotfiles_test_tmproot dotfiles-login-shell-broken)
+  log="$home/calls"
+  out=$(run_bootstrap_login_shell_block "$home" /bin/bash no "$log")
+  assert_not_contains "$(cat "$log" 2>/dev/null)" "chsh" \
+    "bootstrap.sh must never chsh to a zsh that fails to start - that locks the user out of SSH entirely (got: $out)"
+  assert_contains "$out" "leaving the login shell as /bin/bash" \
+    "bootstrap.sh must say it left the login shell alone when the Nix zsh does not start (got: $out)"
+
+  # Idempotent: re-running bootstrap.sh on an already-switched box is a no-op.
+  home=$(dotfiles_test_tmproot dotfiles-login-shell-noop)
+  log="$home/calls"
+  out=$(run_bootstrap_login_shell_block "$home" "$home/.nix-profile/bin/zsh" yes "$log")
+  assert_not_contains "$(cat "$log" 2>/dev/null)" "chsh" \
+    "bootstrap.sh must not re-chsh a user whose login shell is already the Nix zsh (got: $out)"
+  pass "bootstrap.sh switches the Linux login shell to the Nix zsh, refuses to do so if that zsh will not start, and is a no-op once switched"
+}
+
+test_darwin_login_shell_untouched() {
+  # macOS already logs into zsh; the chsh/sudo step must stay in the Linux
+  # branch, which the else-branch structure of bootstrap.sh gives for free.
+  local darwin_branch
+  darwin_branch=$(awk '/^if \[ "\$PLATFORM" = darwin \]; then$/,/^else$/' "$ROOT/bootstrap.sh")
+  [ -n "$darwin_branch" ] || fail "bootstrap.sh no longer has a darwin branch to check"
+  assert_not_contains "$darwin_branch" "chsh" \
+    "bootstrap.sh must not touch the login shell on macOS - it already logs into zsh"
+  pass "bootstrap.sh's macOS branch leaves the login shell alone"
+}
+
 test_darwin_drvpath_unchanged
 test_linux_home_configurations_evaluate
 test_linux_home_manager_cli_enabled
@@ -384,3 +456,5 @@ test_darwin_native_install_absent
 test_linux_ssh_agent_persists
 test_linux_ssh_agent_lingers_across_sessions
 test_darwin_ssh_agent_not_duplicated
+test_bootstrap_sets_zsh_login_shell_on_linux
+test_darwin_login_shell_untouched

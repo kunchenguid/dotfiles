@@ -102,7 +102,9 @@ cd dotfiles
 ./bootstrap.sh
 ```
 
-On Linux, `bootstrap.sh` does four things: installs Determinate Nix (same installer as macOS), symlinks this repo to `~/.dotfiles`, offers to fix the `user` line in `flake.nix` if it doesn't match your Ubuntu username, then runs the first `home-manager switch --flake ~/.dotfiles#<user>@<system>` (pinned to the home-manager `release-26.05` branch, same pattern as the macOS `darwin-rebuild` bootstrap). `<system>` is `x86_64-linux` or `aarch64-linux`, detected from `uname -m`. After that, `./rebuild.sh` works the same way it does on macOS.
+On Linux, `bootstrap.sh` does five things: installs Determinate Nix (same installer as macOS), symlinks this repo to `~/.dotfiles`, offers to fix the `user` line in `flake.nix` if it doesn't match your Ubuntu username, runs the first `home-manager switch --flake ~/.dotfiles#<user>@<system>` (pinned to the home-manager `release-26.05` branch, same pattern as the macOS `darwin-rebuild` bootstrap), then makes `~/.nix-profile/bin/zsh` your login shell. `<system>` is `x86_64-linux` or `aarch64-linux`, detected from `uname -m`. After that, `./rebuild.sh` works the same way it does on macOS.
+
+That last step is the only one here that needs `sudo`, and it matters more than it looks: this repo configures `programs.zsh` and nothing else, so on a box still logging you into Ubuntu's default `/bin/bash` none of it is ever sourced - no aliases, and no `SSH_AUTH_SOCK` (see "Persistent ssh-agent" below), which shows up as every `git pull` re-prompting for your key passphrase. The step adds the Nix zsh to `/etc/shells`, and refuses to switch if that zsh doesn't start: `sshd` hands you your login shell and nothing else, so a broken one locks you out of the machine. Open a new SSH session afterwards to pick it up. macOS already logs into zsh, so it skips this.
 
 What you get is intentionally narrower than the macOS setup: no Homebrew casks/GUI apps (there's no desktop environment to run them), and no macOS-only CLI tools (`thefuck`, `echidna`, `solc-select`, `tenderly`, `postgresql`, `libpq`, `colima` - see `tools.nix`'s `platform = "macos"` entries). Of the fast-moving `platform = "all"` tools (`claude-code`, `codex`, `herdr`, `skills`, `pi-coding-agent`), `tool-selection.nix`'s `useNative` correctly identifies all five as needing a non-Nix installer on Ubuntu (see "Package metadata" below), and all five are wired up: each `tools.nix` entry carries either a `nativeInstallUrl` pointing at the tool's own non-interactive `install.sh` (`claude-code`, `codex`, `herdr`, `pi-coding-agent`) or a `nativeInstallNpmPackage` for tools with no install script at all, just an npm package (`skills`). `home.nix`'s `installNativeTools` activation script runs each one on every `rebuild.sh` (skipping the ones already present under their real `~/.local/bin` launcher name - see `nativeInstallBinName` for the two whose launcher name differs from their `tools.nix` entry name), with `CODEX_NON_INTERACTIVE=1`, `NPM_CONFIG_PREFIX=$HOME/.local`, and `~/.local/bin` pre-populated on `PATH` so none of the five ever fall into an interactive prompt or a shell-rc-rewriting branch, and `~/.local/bin` on `home.sessionPath` so they're actually reachable afterward. `pkgs.nodejs` is included in `home.packages` on Linux because `skills` and `pi-coding-agent`'s launchers are npm-backed and shebang into `node` at runtime, not just during install.
 
@@ -149,7 +151,10 @@ add the new `Include` lines. If you used the old
 
 **Persistent ssh-agent (Linux only):** `home.nix` enables home-manager's
 `services.ssh-agent` on Linux, which runs a `systemd --user` unit that starts
-on login with `SSH_AUTH_SOCK` wired into zsh automatically. On headless Ubuntu,
+on login with `SSH_AUTH_SOCK` wired into zsh automatically. Note *zsh*: that
+module only injects the socket into the shells home-manager manages, so the
+agent is invisible from a `bash` login shell - which is why `bootstrap.sh`
+makes zsh your login shell on Ubuntu. On headless Ubuntu,
 the config also enables systemd lingering so the user service, ssh-agent, and
 cached keys survive after the SSH session that ran `rebuild.sh` closes.
 Combined with `AddKeysToAgent yes` above, this means a key's passphrase only

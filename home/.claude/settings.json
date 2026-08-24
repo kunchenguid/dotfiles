@@ -56,6 +56,6 @@
   "awaySummaryEnabled": false,
   "showThinkingSummaries": false,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark-ansi",
+  "theme": "auto",
   "verbose": false
 }

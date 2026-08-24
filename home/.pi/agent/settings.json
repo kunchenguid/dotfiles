@@ -16,7 +16,7 @@
     "npm:@ryan_nookpi/pi-extension-codex-fast-mode@0.2.6",
     "git:github.com/algal/pi-openai-server-compaction@c6d593087709e9481223dc6c6c2269b371b5e055"
   ],
-  "lastChangelogVersion": "0.84.2",
+  "lastChangelogVersion": "0.84.3",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.5",
   "defaultThinkingLevel": "medium"

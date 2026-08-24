@@ -257,10 +257,13 @@ in
       ""
     else
       ''
-        if [ -n "''${DRY_RUN_CMD:-}" ]; then
-          $DRY_RUN_CMD loginctl enable-linger "$(id -un)"
+        # Absolute path: loginctl ships with the host's systemd, not Nix, and
+        # activation runs with a curated PATH that does not include /usr/bin.
+        if [ -x /usr/bin/loginctl ]; then
+          ''${DRY_RUN_CMD:-} /usr/bin/loginctl enable-linger "$(id -un)" ||
+            echo "WARNING: loginctl enable-linger failed - ssh-agent will not survive across SSH sessions" >&2
         else
-          loginctl enable-linger "$(id -un)"
+          echo "WARNING: /usr/bin/loginctl not found - skipping enable-linger; ssh-agent will not survive across SSH sessions" >&2
         fi
       ''
   );
