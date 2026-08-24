@@ -116,6 +116,14 @@ the shell to use. The real file is ignored by Git. For example, setting
 `HETZNER_HOST` there enables the `hetzner` zsh alias as `ssh <user>@$HETZNER_HOST`
 without committing the host value to this public repo.
 
+**Private SSH hosts:** copy `home/.ssh/config.private.example` to
+`home/.ssh/config.private` and add your real per-host entries (hostnames/IPs,
+usernames, ports, identity files). The real file is ignored by Git.
+`programs.ssh` in `home.nix` manages the safe, general defaults (github.com,
+`Host *` hardening) declaratively and `Include`s `config.private` into the
+generated `~/.ssh/config`, so your private entries still take effect after
+`home-manager switch` without ever being committed.
+
 **Git identity:** this config deliberately does not set your git name or email.
 Git will stop your first commit and tell you to set them (`git config --global user.name "Your Name"` and `git config --global user.email you@example.com`).
 If you'd rather manage that declaratively, add this back to `home.nix` with your own identity:

@@ -111,6 +111,26 @@ in
     };
   };
 
+  # Safe, general SSH defaults live here declaratively. Per-host entries with
+  # real hostnames/IPs/usernames stay in the gitignored home/.ssh/config.private
+  # (copy from config.private.example) - see README.md "Private SSH hosts".
+  programs.ssh = {
+    enable = true;
+    includes = [ "${dotfiles}/home/.ssh/config.private" ]
+      ++ lib.optional isDarwin "${config.home.homeDirectory}/.colima/ssh_config";
+    settings = {
+      "github.com" = {
+        AddKeysToAgent = "yes";
+        IdentitiesOnly = true;
+        IdentityFile = "~/.ssh/id_rsa";
+      } // lib.optionalAttrs isDarwin { UseKeychain = "yes"; };
+      "*" = {
+        AddKeysToAgent = "yes";
+        IdentitiesOnly = true;
+      };
+    };
+  };
+
   programs.zoxide = {
     enable = true;
     options = [ "--cmd" "cd" ];

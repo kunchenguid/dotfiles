@@ -21,5 +21,9 @@ result-*
 # Private shell values read by home.nix; copy from the example and keep local
 /home/.config/zsh/private-env.zsh
 
+# Private per-host SSH entries merged via programs.ssh's Include; copy from
+# the example and keep local
+/home/.ssh/config.private
+
 # no-mistakes local validation state - never commit in this public repo
 .no-mistakes/
