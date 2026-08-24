@@ -116,6 +116,31 @@ the shell to use. The real file is ignored by Git. For example, setting
 `HETZNER_HOST` there enables the `hetzner` zsh alias as `ssh <user>@$HETZNER_HOST`
 without committing the host value to this public repo.
 
+**SSH config:** `~/.ssh/config` itself is never managed by home-manager - it
+stays local so Colima and other tools can rewrite it freely, and rebuild
+never overwrites or regenerates it. Instead, `home.nix` symlinks two
+dotfiles-owned fragments into `~/.ssh/` and idempotently prepends `Include`
+lines for them to `~/.ssh/config` on every rebuild (an activation script;
+safe to run repeatedly - it never duplicates the `Include` lines and never
+touches the rest of the file, so Colima's own appended entries survive):
+
+- `~/.ssh/dotfiles.config.public` - safe, general defaults (github.com and
+  `Host *` identity settings), symlinked from the committed, per-platform
+  `home/.ssh/dotfiles.config.public.darwin` or `.linux`.
+- `~/.ssh/dotfiles.config.private` - your real per-host entries
+  (hostnames/IPs, usernames, ports, identity files), symlinked from
+  `home/.ssh/dotfiles.config.private`. Copy
+  `home/.ssh/dotfiles.config.private.example` to
+  `home/.ssh/dotfiles.config.private` and fill it in; the real file is
+  ignored by Git.
+
+On a new machine, the first `home-manager switch` creates `~/.ssh/config` if
+missing and wires in both `Include` lines automatically - no manual paste.
+On a machine that already used this repo's older SSH setup, rebuild once to
+add the new `Include` lines. If you used the old
+`home/.ssh/config.private` file, copy its entries into
+`home/.ssh/dotfiles.config.private`; it is not renamed automatically.
+
 **Git identity:** this config deliberately does not set your git name or email.
 Git will stop your first commit and tell you to set them (`git config --global user.name "Your Name"` and `git config --global user.email you@example.com`).
 If you'd rather manage that declaratively, add this back to `home.nix` with your own identity:

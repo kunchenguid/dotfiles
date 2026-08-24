@@ -17,11 +17,14 @@ FLAKE_USER=thomasharper
 # Pinned at the moment Ubuntu support was layered on top of the tools.nix
 # refactor (PR #17, merged as 51fe4b7), then re-pinned after deliberate
 # macOS-affecting changes to shared Home Manager zsh initContent, most recently
-# when the Hetzner alias changed from root to the configured user. Update this
-# only alongside a deliberate macOS-affecting change; an unexpected mismatch
-# means something meant to be Linux-only leaked into the shared macOS
-# evaluation.
-EXPECTED_DARWIN_DRVPATH="/nix/store/cvwdzi90ia2axilzpjghii48mnxcppih-darwin-system-26.05.adda04f.drv"
+# when the Hetzner alias changed from root to the configured user, then
+# re-pinned again after the fm/dotfiles-ssh-fragment-approach change replaced
+# programs.ssh with fragment symlinks + an Include-prepending activation
+# script in home.nix.
+# Update this only alongside a deliberate macOS-affecting change; an
+# unexpected mismatch means something meant to be Linux-only leaked into
+# the shared macOS evaluation.
+EXPECTED_DARWIN_DRVPATH="/nix/store/50xdh8icbkm5qyh90nrwmhlwbiaf8rl1-darwin-system-26.05.adda04f.drv"
 
 test_darwin_drvpath_unchanged() {
   if ! command -v nix >/dev/null 2>&1; then
