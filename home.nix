@@ -170,7 +170,7 @@ in
   # activation script below). Safe cross-machine defaults live in the
   # committed, per-platform dotfiles.config.public.{darwin,linux}; per-host
   # secrets live in the gitignored dotfiles.config.private (copy from
-  # dotfiles.config.private.example) - see README.md "Private SSH hosts".
+  # dotfiles.config.private.example) - see README.md "SSH config".
   home.file.".ssh/dotfiles.config.public".source =
     config.lib.file.mkOutOfStoreSymlink
       "${dotfiles}/home/.ssh/dotfiles.config.public.${if isDarwin then "darwin" else "linux"}";

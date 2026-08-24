@@ -24,7 +24,7 @@ FLAKE_USER=thomasharper
 # Update this only alongside a deliberate macOS-affecting change; an
 # unexpected mismatch means something meant to be Linux-only leaked into
 # the shared macOS evaluation.
-EXPECTED_DARWIN_DRVPATH="/nix/store/kb9rsb2fylavzvb07qw5z8vb7plmp95f-darwin-system-26.05.adda04f.drv"
+EXPECTED_DARWIN_DRVPATH="/nix/store/50xdh8icbkm5qyh90nrwmhlwbiaf8rl1-darwin-system-26.05.adda04f.drv"
 
 test_darwin_drvpath_unchanged() {
   if ! command -v nix >/dev/null 2>&1; then
