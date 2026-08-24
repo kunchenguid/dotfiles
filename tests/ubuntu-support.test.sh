@@ -18,7 +18,7 @@ FLAKE_USER=thomasharper
 # refactor (PR #17, merged as 51fe4b7). Update this only alongside a
 # deliberate macOS-affecting change; an unexpected mismatch means something
 # meant to be Linux-only leaked into the shared macOS evaluation.
-EXPECTED_DARWIN_DRVPATH="/nix/store/5f607r0w92yn7mp7g732xkkvkgj58zlx-darwin-system-26.05.adda04f.drv"
+EXPECTED_DARWIN_DRVPATH="/nix/store/182wiayrj1rg3csnylcyjsfsmzsplmrp-darwin-system-26.05.adda04f.drv"
 
 test_darwin_drvpath_unchanged() {
   if ! command -v nix >/dev/null 2>&1; then

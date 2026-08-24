@@ -98,7 +98,7 @@ cd dotfiles
 
 On Linux, `bootstrap.sh` does four things: installs Determinate Nix (same installer as macOS), symlinks this repo to `~/.dotfiles`, offers to fix the `user` line in `flake.nix` if it doesn't match your Ubuntu username, then runs the first `home-manager switch --flake ~/.dotfiles#<user>@<system>` (pinned to the home-manager `release-26.05` branch, same pattern as the macOS `darwin-rebuild` bootstrap). `<system>` is `x86_64-linux` or `aarch64-linux`, detected from `uname -m`. After that, `./rebuild.sh` works the same way it does on macOS.
 
-What you get is intentionally narrower than the macOS setup: no Homebrew casks/GUI apps (there's no desktop environment to run them), and no macOS-only CLI tools (`thefuck`, `echidna`, `solc-select`, `tenderly`, `postgresql`, `libpq`, `colima` - see `tools.nix`'s `platform = "macos"` entries). Fast-moving `platform = "all"` tools (`claude-code`, `codex`, `herdr`, `skills`, `pi-coding-agent`) are also not yet installed automatically on Ubuntu - `tools.nix`'s `useNative` correctly identifies them as needing a non-Nix installer (see "Package metadata" above), but that installer isn't wired up yet; install them manually per their own docs for now.
+What you get is intentionally narrower than the macOS setup: no Homebrew casks/GUI apps (there's no desktop environment to run them), and no macOS-only CLI tools (`thefuck`, `echidna`, `solc-select`, `tenderly`, `postgresql`, `libpq`, `colima` - see `tools.nix`'s `platform = "macos"` entries). Fast-moving `platform = "all"` tools (`claude-code`, `codex`, `herdr`, `skills`, `pi-coding-agent`) are also not yet installed automatically on Ubuntu - `tool-selection.nix`'s `useNative` correctly identifies them as needing a non-Nix installer (see "Package metadata" below), but that installer isn't wired up yet; install them manually per their own docs for now.
 
 ## Make it yours
 
@@ -125,9 +125,9 @@ programs.git = {
 ```
 
 **Homebrew cleanup warning:** `configuration.nix` sets `homebrew.onActivation.cleanup = "zap"`.
-That means every time you switch, Homebrew removes any package or cask on your machine that isn't listed in the `brews` and `casks` arrays in `configuration.nix`.
+That means every time you switch on macOS, Homebrew removes any package or cask on your machine that isn't selected from `tools.nix` into `configuration.nix`'s `homebrew.brews` and `homebrew.casks`.
 If you already have Homebrew stuff installed that isn't in that list, the first switch will uninstall it.
-Read through `brews` and `casks` before you run `bootstrap.sh` or `rebuild.sh` for the first time, and add anything you want to keep.
+Read through the Homebrew-selected entries in `tools.nix` before you run `bootstrap.sh` or `rebuild.sh` for the first time, and add anything you want to keep.
 
 **Existing Homebrew install:** `configuration.nix` sets `nix-homebrew.autoMigrate = true`, so if `/opt/homebrew` already has a non-Nix Homebrew install on it (common on a Mac you were already using), the first switch migrates it in place under nix-homebrew's management instead of erroring out. Your existing taps and packages are kept; the `zap` cleanup above still applies on top of that.
 
@@ -151,7 +151,7 @@ If you don't use it, just remove its entry from `tools.nix` in your copy.
 
 (`brewName`/`nixName` are optional overrides for when the Homebrew or nixpkgs name differs from the tool's `name`. `platform = "ubuntu"` isn't used by any entry yet - see below.)
 
-`tool-selection.nix` turns that table into concrete selections in two stages. `configuration.nix` consumes those selections for macOS `environment.systemPackages`, `homebrew.brews`, and `homebrew.casks`; `home.nix` consumes them for Ubuntu `home.packages` and native-installer classification. First, whether the tool exists on this machine at all:
+`tool-selection.nix` turns that table into concrete selections in two stages. `configuration.nix` consumes those selections for macOS `environment.systemPackages`, `homebrew.brews`, and `homebrew.casks`; `home.nix` consumes them for Ubuntu `home.packages`; and `nativeTools` records the Ubuntu tools that still need installer wiring. First, whether the tool exists on this machine at all:
 
 ```text
 scope:
