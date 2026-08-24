@@ -46,19 +46,21 @@ let
   brewName = t: t.brewName or t.name;
   nixName = t: t.nixName or t.name;
   nativeInstallUrl = t: t.nativeInstallUrl or null;
+  nativeInstallNpmPackage = t: t.nativeInstallNpmPackage or null;
+  nativeInstallBinName = t: t.nativeInstallBinName or t.name;
 
   enabled = lib.filter isEnabled tools;
   nativeTools = lib.filter useNative enabled;
 in
 {
-  inherit isEnabled isForCurrentPlatform useNix useHomebrew useNative isCaskTool brewName nixName nativeInstallUrl;
+  inherit isEnabled isForCurrentPlatform useNix useHomebrew useNative isCaskTool brewName nixName nativeInstallUrl nativeInstallNpmPackage nativeInstallBinName;
   nixTools = lib.filter useNix enabled;
   brewTools = lib.filter (t: useHomebrew t && !isCaskTool t) enabled;
   caskTools = lib.filter (t: useHomebrew t && isCaskTool t) enabled;
   inherit nativeTools;
   # Of the useNative-selected tools, only the subset with a working,
-  # unattended installer actually wired up - see tools.nix's
-  # nativeInstallUrl comment on herdr for why the other useNative tools
-  # are excluded rather than force-fit into the same mechanism.
-  nativeInstallTools = lib.filter (t: nativeInstallUrl t != null) nativeTools;
+  # unattended installer actually wired up - see tools.nix's nativeInstallUrl
+  # comment for each tool's non-interactive install path and why it's safe
+  # to run unattended from home.activation.
+  nativeInstallTools = lib.filter (t: nativeInstallUrl t != null || nativeInstallNpmPackage t != null) nativeTools;
 }

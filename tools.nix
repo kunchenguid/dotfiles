@@ -7,19 +7,32 @@
 [
   # Fast-moving CLI agents wanted on every machine - track upstream closely,
   # so Homebrew rather than a pinned nixpkgs version.
-  { name = "claude-code"; scope = "basic"; platform = "all"; updatePolicy = "fast"; isCask = true; }
-  { name = "codex"; scope = "basic"; platform = "all"; updatePolicy = "fast"; isCask = true; }
-  # nativeInstallUrl: herdr's own install.sh (https://herdr.dev/docs/install/) -
-  # non-interactive, checksum-verified, and defaults to ~/.local/bin with no
-  # shell-profile side effects, so it's safe to run unattended from
-  # home.activation. claude-code/codex/pi-coding-agent's installers are
-  # interactive and/or rewrite shell rc files themselves (fighting
-  # home-manager's declarative zsh config), so they're left without this
-  # field - see tool-selection.nix's nativeInstallUrl helper and
-  # home.nix's installNativeTools activation script.
+  # nativeInstallUrl: each of these ships an official install.sh that is
+  # non-interactive and checksum-/registry-verified when no /dev/tty is
+  # attached (confirmed by running each live in a clean Ubuntu 22.04
+  # container - see tool-selection.nix's nativeInstallUrl helper and
+  # home.nix's installNativeTools activation script for how CODEX_NON_INTERACTIVE,
+  # NPM_CONFIG_PREFIX, and the pre-populated ~/.local/bin PATH keep all of
+  # these out of shell-rc-mutation branches):
+  # - claude-code: claude.ai/install.sh drops straight to ~/.local/bin/claude
+  #   with no prompts and no rc edits, tty or not.
+  # - codex: chatgpt.com/codex/install.sh only rewrites a shell profile when
+  #   its target bin dir isn't already on $PATH; CODEX_NON_INTERACTIVE=1 also
+  #   skips its "start now?"/uninstall-conflict prompts.
+  # - pi-coding-agent: pi.dev/install.sh only prompts to install Node.js
+  #   itself when Node isn't already on $PATH; with pkgs.nodejs present it
+  #   detects no tty and proceeds via plain `npm install -g`.
+  # nativeInstallBinName: the launcher binary these two installers actually
+  # produce in ~/.local/bin differs from the tools.nix entry name (upstream
+  # naming, not ours) - home.nix's "already installed" skip check needs the
+  # real binary name or it would re-run the installer on every rebuild.
+  { name = "claude-code"; scope = "basic"; platform = "all"; updatePolicy = "fast"; isCask = true; nativeInstallUrl = "https://claude.ai/install.sh"; nativeInstallBinName = "claude"; }
+  { name = "codex"; scope = "basic"; platform = "all"; updatePolicy = "fast"; isCask = true; nativeInstallUrl = "https://chatgpt.com/codex/install.sh"; }
   { name = "herdr"; scope = "basic"; platform = "all"; updatePolicy = "fast"; nativeInstallUrl = "https://herdr.dev/install.sh"; }
-  { name = "skills"; scope = "basic"; platform = "all"; updatePolicy = "fast"; }
-  { name = "pi-coding-agent"; scope = "basic"; platform = "all"; updatePolicy = "fast"; }
+  # skills has no install.sh upstream at all - just the npm package of the
+  # same name - so it uses nativeInstallNpmPackage instead of nativeInstallUrl.
+  { name = "skills"; scope = "basic"; platform = "all"; updatePolicy = "fast"; nativeInstallNpmPackage = "skills"; }
+  { name = "pi-coding-agent"; scope = "basic"; platform = "all"; updatePolicy = "fast"; nativeInstallUrl = "https://pi.dev/install.sh"; nativeInstallBinName = "pi"; }
 
   # Stable CLI dev tooling wanted on every machine, personal or not.
   { name = "btop"; scope = "basic"; platform = "all"; updatePolicy = "stable"; }
