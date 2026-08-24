@@ -218,7 +218,7 @@ test_linux_archive_tools_present_for_native_installers() {
 
     patched=$(printf '%s\n' "$data" \
       | sed -E 's#.*curl -fsSL https://claude\.ai/install\.sh.*#:#' \
-      | sed -E "s#.*curl -fsSL https://chatgpt\.com/codex/install\.sh.*#resolved_tar=\\\$(command -v tar) \&\& resolved_gzip=\\\$(command -v gzip) \&\& [ \"\\\$resolved_tar\" = \"$gnutar_path/bin/tar\" ] \&\& [ \"\\\$resolved_gzip\" = \"$gzip_path/bin/gzip\" ] || { echo \"tar/gzip resolved to \\\${resolved_tar:-missing}/\\\${resolved_gzip:-missing}, expected $gnutar_path/bin/tar/$gzip_path/bin/gzip\" >&2; exit 1; }; if [ -n \"\\\${TAR_XZF_FIXTURE:-}\" ]; then mkdir -p \"\\\$HOME/extracted\" \&\& tar -xzf \"\\\$TAR_XZF_FIXTURE\" -C \"\\\$HOME/extracted\" \&\& [ -f \"\\\$HOME/extracted/payload\" ]; fi#" \
+      | sed -E "s#.*curl -fsSL https://chatgpt\.com/codex/install\.sh.*#resolved_tar=\\\$(command -v tar) \&\& resolved_gzip=\\\$(command -v gzip) \&\& [ \"\\\$resolved_tar\" = \"$gnutar_path/bin/tar\" ] \&\& [ \"\\\$resolved_gzip\" = \"$gzip_path/bin/gzip\" ] || { echo \"tar/gzip resolved to \\\${resolved_tar:-missing}/\\\${resolved_gzip:-missing}, expected $gnutar_path/bin/tar/$gzip_path/bin/gzip\"; exit 1; }; if [ -n \"\\\${TAR_XZF_FIXTURE:-}\" ]; then mkdir -p \"\\\$HOME/extracted\" \&\& tar -xzf \"\\\$TAR_XZF_FIXTURE\" -C \"\\\$HOME/extracted\" \&\& [ -f \"\\\$HOME/extracted/payload\" ]; fi#" \
       | sed -E 's#.*curl -fsSL https://herdr\.dev/install\.sh.*#:#' \
       | sed -E 's#.*npm install -g skills.*#:#' \
       | sed -E 's#.*curl -fsSL https://pi\.dev/install\.sh.*#:#')
