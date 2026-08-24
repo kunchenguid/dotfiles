@@ -1,0 +1,4 @@
+# Copy this file to private-env.zsh in the same directory and fill in local-only values.
+# private-env.zsh is ignored by Git and sourced by Home Manager's zsh config when present.
+
+export HETZNER_HOST="your-server-ip-or-hostname"

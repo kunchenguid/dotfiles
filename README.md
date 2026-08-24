@@ -110,6 +110,12 @@ If you clone it, review these before you run `bootstrap.sh`:
 - **Host label**: change the single `hostLabel = "mac";` line in `flake.nix` (`rebuild.sh`/`bootstrap.sh` read it back out, so nothing else needs editing).
 - **CPU architecture**: on macOS, set `hostPlatform` in `configuration.nix` (see Prerequisites above); on Ubuntu, `bootstrap.sh` and `rebuild.sh` map `uname -m` to `x86_64-linux` or `aarch64-linux`.
 
+**Private shell values:** copy `home/.config/zsh/private-env.zsh.example` to
+`home/.config/zsh/private-env.zsh` and fill in any local-only values you want
+the shell to use. The real file is ignored by Git. For example, setting
+`HETZNER_HOST` there enables the `hetzner` zsh alias as `ssh root@$HETZNER_HOST`
+without committing the host value to this public repo.
+
 **Git identity:** this config deliberately does not set your git name or email.
 Git will stop your first commit and tell you to set them (`git config --global user.name "Your Name"` and `git config --global user.email you@example.com`).
 If you'd rather manage that declaratively, add this back to `home.nix` with your own identity:
