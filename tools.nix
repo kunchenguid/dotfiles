@@ -9,7 +9,15 @@
   # so Homebrew rather than a pinned nixpkgs version.
   { name = "claude-code"; scope = "basic"; platform = "all"; updatePolicy = "fast"; isCask = true; }
   { name = "codex"; scope = "basic"; platform = "all"; updatePolicy = "fast"; isCask = true; }
-  { name = "herdr"; scope = "basic"; platform = "all"; updatePolicy = "fast"; }
+  # nativeInstallUrl: herdr's own install.sh (https://herdr.dev/docs/install/) -
+  # non-interactive, checksum-verified, and defaults to ~/.local/bin with no
+  # shell-profile side effects, so it's safe to run unattended from
+  # home.activation. claude-code/codex/pi-coding-agent's installers are
+  # interactive and/or rewrite shell rc files themselves (fighting
+  # home-manager's declarative zsh config), so they're left without this
+  # field - see tool-selection.nix's nativeInstallUrl helper and
+  # home.nix's installNativeTools activation script.
+  { name = "herdr"; scope = "basic"; platform = "all"; updatePolicy = "fast"; nativeInstallUrl = "https://herdr.dev/install.sh"; }
   { name = "skills"; scope = "basic"; platform = "all"; updatePolicy = "fast"; }
   { name = "pi-coding-agent"; scope = "basic"; platform = "all"; updatePolicy = "fast"; }
 

@@ -45,6 +45,32 @@ in
     # non-personal machines (e.g. a server).
     (if usePersonalSetup then texlive.combined.scheme-full else texlive.combined.scheme-basic)
   ] ++ lib.optionals (!isDarwin) linuxNixTools;
+  # Fast-moving tools.nix entries with a verified non-interactive install.sh
+  # (currently just herdr - see tools.nix's nativeInstallUrl comment for why
+  # the other useNative-selected tools aren't included here). Skips the
+  # download when the binary is already present, so a rebuild with network
+  # access already spent doesn't re-fetch every time.
+  home.activation.installNativeTools = lib.mkIf (!isDarwin) (
+    lib.hm.dag.entryAfter [ "writeBoundary" ] (lib.concatMapStrings (t: ''
+      if [ ! -x "$HOME/.local/bin/${t.name}" ]; then
+        if [ -n "''${DRY_RUN_CMD:-}" ]; then
+          echo "Would install ${t.name} via ${t.nativeInstallUrl}"
+        else
+          # install.sh scripts (herdr's included) shell out to their own
+          # curl/coreutils calls internally, so both the outer curl and the
+          # piped-in script need those on PATH - export, don't prefix, so it
+          # covers the whole pipeline instead of just curl.
+          (
+            export PATH="${pkgs.curl}/bin:${pkgs.coreutils}/bin:${pkgs.gawk}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:$PATH"
+            ${pkgs.curl}/bin/curl -fsSL ${lib.escapeShellArg t.nativeInstallUrl} | ${pkgs.runtimeShell}
+          )
+        fi
+      fi
+    '') sel.nativeInstallTools)
+  );
+  # So a native-installed binary like herdr (placed in ~/.local/bin by its
+  # own installer, above) is actually reachable after a shell restart.
+  home.sessionPath = lib.optionals (!isDarwin) [ "${config.home.homeDirectory}/.local/bin" ];
   fonts.fontconfig.enable = true;
   home.sessionVariables.EDITOR = "nvim";
   home.sessionVariables.CLICOLOR = "1";

@@ -98,7 +98,7 @@ cd dotfiles
 
 On Linux, `bootstrap.sh` does four things: installs Determinate Nix (same installer as macOS), symlinks this repo to `~/.dotfiles`, offers to fix the `user` line in `flake.nix` if it doesn't match your Ubuntu username, then runs the first `home-manager switch --flake ~/.dotfiles#<user>@<system>` (pinned to the home-manager `release-26.05` branch, same pattern as the macOS `darwin-rebuild` bootstrap). `<system>` is `x86_64-linux` or `aarch64-linux`, detected from `uname -m`. After that, `./rebuild.sh` works the same way it does on macOS.
 
-What you get is intentionally narrower than the macOS setup: no Homebrew casks/GUI apps (there's no desktop environment to run them), and no macOS-only CLI tools (`thefuck`, `echidna`, `solc-select`, `tenderly`, `postgresql`, `libpq`, `colima` - see `tools.nix`'s `platform = "macos"` entries). Fast-moving `platform = "all"` tools (`claude-code`, `codex`, `herdr`, `skills`, `pi-coding-agent`) are also not yet installed automatically on Ubuntu - `tool-selection.nix`'s `useNative` correctly identifies them as needing a non-Nix installer (see "Package metadata" below), but that installer isn't wired up yet; install them manually per their own docs for now.
+What you get is intentionally narrower than the macOS setup: no Homebrew casks/GUI apps (there's no desktop environment to run them), and no macOS-only CLI tools (`thefuck`, `echidna`, `solc-select`, `tenderly`, `postgresql`, `libpq`, `colima` - see `tools.nix`'s `platform = "macos"` entries). Of the fast-moving `platform = "all"` tools (`claude-code`, `codex`, `herdr`, `skills`, `pi-coding-agent`), `tool-selection.nix`'s `useNative` correctly identifies all five as needing a non-Nix installer on Ubuntu (see "Package metadata" below), but only `herdr` actually has one wired up: its `tools.nix` entry carries a `nativeInstallUrl` pointing at herdr's own non-interactive `install.sh`, which `home.nix`'s `installNativeTools` activation script runs on every `rebuild.sh` (skipping the download once `~/.local/bin/herdr` exists), with `~/.local/bin` added to `PATH` via `home.sessionPath` so it's actually reachable afterward. The other four don't have this field set - their install scripts are either interactive or rewrite shell rc files themselves, which fights home-manager's declarative zsh config, so they still need installing manually per their own docs for now.
 
 ## Make it yours
 
@@ -180,9 +180,9 @@ If you don't use it, just remove its entry from `tools.nix` in your copy.
 | `updatePolicy` | Do I want the latest upstream version quickly?    | `stable` / `fast`             |
 | `isCask`       | If installed through Homebrew, is it a cask?      | `true` / omitted              |
 
-(`brewName`/`nixName` are optional overrides for when the Homebrew or nixpkgs name differs from the tool's `name`. `platform = "ubuntu"` is used by the `gcc`/`gnumake`/`pkg-config` build-toolchain entries, needed so nvim-treesitter can compile parsers on Ubuntu - macOS gets the same via Xcode Command Line Tools instead.)
+(`brewName`/`nixName` are optional overrides for when the Homebrew or nixpkgs name differs from the tool's `name`. `nativeInstallUrl` is an optional URL to a non-interactive, PATH-side-effect-free `install.sh` for a Ubuntu `useNative` tool - see below and `home.nix`'s `installNativeTools` activation script; only `herdr` sets it today. `platform = "ubuntu"` is used by the `gcc`/`gnumake`/`pkg-config` build-toolchain entries, needed so nvim-treesitter can compile parsers on Ubuntu - macOS gets the same via Xcode Command Line Tools instead.)
 
-`tool-selection.nix` turns that table into concrete selections in two stages. `configuration.nix` consumes those selections for macOS `environment.systemPackages`, `homebrew.brews`, and `homebrew.casks`; `home.nix` consumes them for Ubuntu `home.packages`; and `nativeTools` records the Ubuntu tools that still need installer wiring. First, whether the tool exists on this machine at all:
+`tool-selection.nix` turns that table into concrete selections in two stages. `configuration.nix` consumes those selections for macOS `environment.systemPackages`, `homebrew.brews`, and `homebrew.casks`; `home.nix` consumes them for Ubuntu `home.packages` and, for the `nativeInstallTools` subset, an activation script that runs each one's `nativeInstallUrl` script directly. First, whether the tool exists on this machine at all:
 
 ```text
 scope:
@@ -205,9 +205,9 @@ macOS:
 
 Ubuntu:
   stable + all     -> Nix
-  fast + all       -> native installer (not yet wired up - see "Ubuntu setup")
+  fast + all       -> native installer (only wired up if nativeInstallUrl is set - see "Ubuntu setup")
   stable + ubuntu  -> Nix
-  fast + ubuntu    -> native installer (not yet wired up)
+  fast + ubuntu    -> native installer (only wired up if nativeInstallUrl is set)
 ```
 
 `currentPlatform` isn't one global constant: `configuration.nix` hardcodes it to `"macos"` (there's only one macOS target), while each Ubuntu `homeConfigurations."<user>@<system>"` output in `home.nix` derives it from `pkgs.stdenv.isDarwin`, so it's correct per-output rather than a single file-level toggle that would only ever be right for one platform at a time.

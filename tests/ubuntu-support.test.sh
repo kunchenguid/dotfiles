@@ -86,7 +86,44 @@ test_linux_treesitter_buildtools_present() {
   pass "gcc, make, and pkg-config are wired into home.packages for both Linux homeConfigurations outputs"
 }
 
+test_linux_herdr_native_install_wired() {
+  if ! command -v nix >/dev/null 2>&1; then
+    echo "skip: nix not found for Linux herdr native-install check"
+    return 0
+  fi
+  local system data path_json
+  for system in x86_64-linux aarch64-linux; do
+    data=$(cd "$ROOT" && nix eval --raw ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.activation.installNativeTools.data" 2>/dev/null) \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" has no installNativeTools activation script - useNative correctly classifying herdr is not enough, something has to actually install it"
+    assert_contains "$data" "herdr" \
+      "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools script does not mention herdr"
+    assert_contains "$data" "https://herdr.dev/install.sh" \
+      "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools script does not call herdr's real install.sh"
+
+    path_json=$(cd "$ROOT" && nix eval --json ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.sessionPath" 2>/dev/null) \
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" home.sessionPath failed to evaluate"
+    assert_contains "$path_json" ".local/bin" \
+      "homeConfigurations.\"${FLAKE_USER}@${system}\" does not put ~/.local/bin (where the native installer places herdr) on PATH - herdr would install but stay unreachable"
+  done
+  pass "herdr's native installer is wired into home.activation and its install dir is on sessionPath for both Linux homeConfigurations outputs"
+}
+
+test_darwin_native_install_absent() {
+  if ! command -v nix >/dev/null 2>&1; then
+    echo "skip: nix not found for Darwin native-install absence check"
+    return 0
+  fi
+  local names
+  names=$(cd "$ROOT" && nix eval --json '.#darwinConfigurations.mac.config.home-manager.users.thomasharper.home.activation' --apply 'a: builtins.attrNames a' 2>/dev/null) \
+    || fail "darwinConfigurations.mac home.activation failed to evaluate"
+  assert_not_contains "$names" "installNativeTools" \
+    "darwinConfigurations.mac must not get the Linux-only native installer activation script - herdr is Homebrew-managed on macOS"
+  pass "darwinConfigurations.mac has no installNativeTools activation script (herdr stays Homebrew-managed on macOS)"
+}
+
 test_darwin_drvpath_unchanged
 test_linux_home_configurations_evaluate
 test_linux_home_manager_cli_enabled
 test_linux_treesitter_buildtools_present
+test_linux_herdr_native_install_wired
+test_darwin_native_install_absent
