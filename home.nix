@@ -116,6 +116,7 @@ in
   # (copy from config.private.example) - see README.md "Private SSH hosts".
   programs.ssh = {
     enable = true;
+    enableDefaultConfig = false;
     includes = [ "${dotfiles}/home/.ssh/config.private" ]
       ++ lib.optional isDarwin "${config.home.homeDirectory}/.colima/ssh_config";
     settings = {
@@ -126,7 +127,16 @@ in
       } // lib.optionalAttrs isDarwin { UseKeychain = "yes"; };
       "*" = {
         AddKeysToAgent = "yes";
+        Compression = false;
+        ControlMaster = "no";
+        ControlPath = "~/.ssh/master-%r@%n:%p";
+        ControlPersist = "no";
+        ForwardAgent = false;
+        HashKnownHosts = false;
         IdentitiesOnly = true;
+        ServerAliveCountMax = 3;
+        ServerAliveInterval = 0;
+        UserKnownHostsFile = "~/.ssh/known_hosts";
       };
     };
   };
