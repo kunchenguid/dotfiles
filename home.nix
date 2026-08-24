@@ -75,7 +75,7 @@ in
       unset private_env
 
       if [[ -n "''${HETZNER_HOST:-}" ]]; then
-        alias hetzner="ssh root@$HETZNER_HOST"
+        alias hetzner="ssh ${user}@$HETZNER_HOST"
       fi
     '';
     shellAliases = {
