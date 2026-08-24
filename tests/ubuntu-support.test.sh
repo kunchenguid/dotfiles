@@ -175,24 +175,28 @@ pi-coding-agent pi"
   pass "claude-code, codex, herdr, skills, and pi-coding-agent's native installers are all wired into home.activation, correctly keyed to their real ~/.local/bin binary names, for both Linux homeConfigurations outputs"
 }
 
-test_linux_gnutar_present_for_native_installers() {
+test_linux_archive_tools_present_for_native_installers() {
   if ! command -v nix >/dev/null 2>&1; then
-    echo "skip: nix not found for Linux gnutar check"
+    echo "skip: nix not found for Linux archive-tools check"
     return 0
   fi
   # codex's own installer hard-requires a `tar` binary to unpack its
   # download ("tar is required to install Codex."), and a genuinely minimal
   # Ubuntu base image can lack one entirely - unlike Docker Hub's
   # ubuntu:22.04, which happens to ship tar and can mask this in testing.
-  # gnutar must be Nix-managed (home.packages) and wired into
+  # gnutar and gzip must be Nix-managed (home.packages) and wired into
   # installNativeTools' own curated PATH export, not just assumed present.
-  local system names data gnutar_path patched tmp_home empty_path out exit_code
+  local current_system system names data gnutar_path gzip_path patched tmp_home empty_path fixture out exit_code
+  current_system=$(nix eval --raw --impure --expr builtins.currentSystem 2>/dev/null) \
+    || fail "builtins.currentSystem failed to evaluate"
   for system in x86_64-linux aarch64-linux; do
     names=$(cd "$ROOT" && nix eval --json ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.packages" \
       --apply 'pkgs: map (p: p.pname or p.name) pkgs' 2>/dev/null) \
       || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" home.packages failed to evaluate"
     assert_contains "$names" "\"gnutar\"" \
       "homeConfigurations.\"${FLAKE_USER}@${system}\" is missing gnutar - codex's installer requires tar, and a minimal base image may not have one"
+    assert_contains "$names" "\"gzip\"" \
+      "homeConfigurations.\"${FLAKE_USER}@${system}\" is missing gzip - codex's installer uses tar -xzf, and Nix gnutar shells out to gzip for that"
 
     data=$(cd "$ROOT" && nix eval --raw ".#homeConfigurations.\"${FLAKE_USER}@${system}\".config.home.activation.installNativeTools.data" 2>/dev/null) \
       || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools activation script failed to evaluate"
@@ -203,10 +207,17 @@ test_linux_gnutar_present_for_native_installers() {
       in pkgs.gnutar
     " 2>/dev/null) \
       || fail "pkgs.gnutar failed to evaluate for $system"
+    gzip_path=$(cd "$ROOT" && nix eval --raw --impure --expr "
+      let
+        flake = builtins.getFlake \"path:$ROOT\";
+        pkgs = import flake.inputs.nixpkgs { system = \"$system\"; };
+      in pkgs.gzip
+    " 2>/dev/null) \
+      || fail "pkgs.gzip failed to evaluate for $system"
 
     patched=$(printf '%s\n' "$data" \
       | sed -E 's#.*curl -fsSL https://claude\.ai/install\.sh.*#:#' \
-      | sed -E "s#.*curl -fsSL https://chatgpt\.com/codex/install\.sh.*#resolved_tar=\\\$(command -v tar) \&\& [ \"\\\$resolved_tar\" = \"$gnutar_path/bin/tar\" ] || { echo \"tar resolved to \\\${resolved_tar:-missing}, expected $gnutar_path/bin/tar\" >&2; exit 1; }#" \
+      | sed -E "s#.*curl -fsSL https://chatgpt\.com/codex/install\.sh.*#resolved_tar=\\\$(command -v tar) \&\& resolved_gzip=\\\$(command -v gzip) \&\& [ \"\\\$resolved_tar\" = \"$gnutar_path/bin/tar\" ] \&\& [ \"\\\$resolved_gzip\" = \"$gzip_path/bin/gzip\" ] || { echo \"tar/gzip resolved to \\\${resolved_tar:-missing}/\\\${resolved_gzip:-missing}, expected $gnutar_path/bin/tar/$gzip_path/bin/gzip\" >&2; exit 1; }; if [ -n \"\\\${TAR_XZF_FIXTURE:-}\" ]; then mkdir -p \"\\\$HOME/extracted\" \&\& tar -xzf \"\\\$TAR_XZF_FIXTURE\" -C \"\\\$HOME/extracted\" \&\& [ -f \"\\\$HOME/extracted/payload\" ]; fi#" \
       | sed -E 's#.*curl -fsSL https://herdr\.dev/install\.sh.*#:#' \
       | sed -E 's#.*npm install -g skills.*#:#' \
       | sed -E 's#.*curl -fsSL https://pi\.dev/install\.sh.*#:#')
@@ -214,12 +225,20 @@ test_linux_gnutar_present_for_native_installers() {
     tmp_home=$(dotfiles_test_tmproot "dotfiles-gnutar-path-$system")
     empty_path="$tmp_home/empty-path"
     mkdir -p "$empty_path"
-    out=$(HOME="$tmp_home" PATH="$empty_path" /bin/bash -eu -o pipefail -c "$patched" 2>&1)
+    fixture=
+    if [ "$system" = "$current_system" ] && command -v tar >/dev/null 2>&1; then
+      mkdir -p "$tmp_home/archive-src"
+      printf 'payload\n' > "$tmp_home/archive-src/payload"
+      fixture="$tmp_home/payload.tar.gz"
+      tar -czf "$fixture" -C "$tmp_home/archive-src" payload \
+        || fail "failed to create tar -xzf fixture for $system"
+    fi
+    out=$(HOME="$tmp_home" PATH="$empty_path" TAR_XZF_FIXTURE="$fixture" /bin/bash -eu -o pipefail -c "$patched" 2>&1)
     exit_code=$?
     [ "$exit_code" -eq 0 ] \
-      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools must resolve tar from its own curated PATH as $gnutar_path/bin/tar with ambient PATH stripped (exit $exit_code), got: $out"
+      || fail "homeConfigurations.\"${FLAKE_USER}@${system}\" installNativeTools must resolve tar/gzip from its own curated PATH as $gnutar_path/bin/tar and $gzip_path/bin/gzip with ambient PATH stripped, and run tar -xzf when executable (exit $exit_code), got: $out"
   done
-  pass "gnutar is Nix-managed and wired into installNativeTools' PATH for both Linux homeConfigurations outputs"
+  pass "gnutar and gzip are Nix-managed and wired into installNativeTools' PATH for both Linux homeConfigurations outputs"
 }
 
 test_linux_native_install_fault_isolation() {
@@ -287,6 +306,6 @@ test_linux_home_manager_cli_enabled
 test_linux_treesitter_buildtools_present
 test_linux_nodejs_present_for_npm_backed_native_tools
 test_linux_native_install_tools_wired
-test_linux_gnutar_present_for_native_installers
+test_linux_archive_tools_present_for_native_installers
 test_linux_native_install_fault_isolation
 test_darwin_native_install_absent

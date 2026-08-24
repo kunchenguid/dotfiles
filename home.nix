@@ -48,12 +48,12 @@ in
     # skills and pi-coding-agent are npm-backed CLIs (their ~/.local/bin
     # launchers shebang into `node`), so Node needs to stay on PATH after
     # install, not just during it - unlike macOS, where the Homebrew
-    # formula's own `node` dependency covers this. gnutar: codex's installer
-    # shells out to `tar` to unpack its own download, and a genuinely minimal
-    # Ubuntu base image (unlike Docker Hub's ubuntu:22.04) can lack a system
-    # tar binary entirely - Nix-managed here so it's always present rather
-    # than assumed from the base image.
-    ++ lib.optionals (!isDarwin) [ nodejs gnutar ];
+    # formula's own `node` dependency covers this. gnutar/gzip: codex's
+    # installer shells out to `tar -xzf` to unpack its own download, and a
+    # genuinely minimal Ubuntu base image (unlike Docker Hub's ubuntu:22.04) can
+    # lack those binaries entirely - Nix-managed here so they're always present
+    # rather than assumed from the base image.
+    ++ lib.optionals (!isDarwin) [ nodejs gnutar gzip ];
   # Fast-moving tools.nix entries with a verified non-interactive install
   # path (see tools.nix's nativeInstallUrl/nativeInstallNpmPackage comments
   # for each tool's evidence). Skips the install when the binary is already
@@ -78,11 +78,11 @@ in
             # target dir already on PATH and skips rewriting a shell profile;
             # nodejs's bin is included for pi-coding-agent's installer and
             # the npm branch below, both of which need `node`/`npm` present
-            # to do anything. gnutar's bin is included because codex's
-            # installer hard-requires `tar` to unpack its own download, and a
-            # genuinely minimal base image's PATH (appended after this list)
-            # may not have one - see home.packages' gnutar entry above.
-            export PATH="${pkgs.curl}/bin:${pkgs.coreutils}/bin:${pkgs.gawk}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.gnutar}/bin:${pkgs.nodejs}/bin:$HOME/.local/bin:$PATH"
+            # to do anything. gnutar/gzip's bins are included because codex's
+            # installer hard-requires `tar -xzf` to unpack its own download,
+            # and a genuinely minimal base image's PATH (appended after this
+            # list) may not have them - see home.packages' entries above.
+            export PATH="${pkgs.curl}/bin:${pkgs.coreutils}/bin:${pkgs.gawk}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.gnutar}/bin:${pkgs.gzip}/bin:${pkgs.nodejs}/bin:$HOME/.local/bin:$PATH"
             # CODEX_NON_INTERACTIVE: skips codex's installer prompts (safe
             # no-op for the other tools, which don't read it).
             # NPM_CONFIG_PREFIX: nodejs's own npm prefix lives in the
