@@ -229,7 +229,7 @@ One toggle controls both scopes: flip `usePersonalSetup` in `flake.nix` to `fals
   Wires up nixpkgs, nix-darwin, home-manager, and nix-homebrew for the macOS `darwinConfigurations.mac` output, and nixpkgs + home-manager (standalone, no nix-darwin) for the Linux `homeConfigurations."<user>@<system>"` outputs; `usePersonalSetup` selects the brews/casks/Nix-package profile on both.
 - `configuration.nix` - macOS-only system-level config: system defaults, Homebrew, and macOS package selection (see "Package metadata" above).
 - `tools.nix` - the per-tool metadata table every platform selects packages from.
-- `tool-selection.nix` - the shared `isEnabled`/`isForCurrentPlatform`/`useNix`/`useHomebrew`/`useNative` predicates that turn `tools.nix` into concrete package lists for one `currentPlatform`; used by both `configuration.nix` (macOS) and `home.nix` (Ubuntu).
+- `tool-selection.nix` - the shared `isEnabled`/`isForCurrentPlatform`/`useNix`/`useHomebrew`/`useNative` predicates and selected output lists that turn `tools.nix` into concrete installers for one `currentPlatform`; used by both `configuration.nix` (macOS) and `home.nix` (Ubuntu).
 - `home.nix` - user-level config: shell, packages, prompt, and the symlinks described below. Shared between macOS and Ubuntu; platform-specific bits (home directory, Nix-managed package list, a couple of aliases) branch on `pkgs.stdenv.isDarwin`.
 - `rebuild.sh` - re-applies the config after the first switch (macOS or Ubuntu).
   Run this every time you make a change.
