@@ -15,14 +15,13 @@ set -u
 FLAKE_USER=thomasharper
 
 # Pinned at the moment Ubuntu support was layered on top of the tools.nix
-# refactor (PR #17, merged as 51fe4b7), then re-pinned after PR #20
-# (hetzner-alias, merged as 9aac04f) added lines to home.nix's shared
-# initContent string without bumping this constant, which drifted the
-# pin stale even though that PR made no Ubuntu-support change. Update this
+# refactor (PR #17, merged as 51fe4b7), then re-pinned after deliberate
+# macOS-affecting changes to shared Home Manager zsh initContent, most recently
+# when the Hetzner alias changed from root to the configured user. Update this
 # only alongside a deliberate macOS-affecting change; an unexpected mismatch
 # means something meant to be Linux-only leaked into the shared macOS
 # evaluation.
-EXPECTED_DARWIN_DRVPATH="/nix/store/ny4b145bp5rs40fx2qa4r9phk73ym80z-darwin-system-26.05.adda04f.drv"
+EXPECTED_DARWIN_DRVPATH="/nix/store/cvwdzi90ia2axilzpjghii48mnxcppih-darwin-system-26.05.adda04f.drv"
 
 test_darwin_drvpath_unchanged() {
   if ! command -v nix >/dev/null 2>&1; then
