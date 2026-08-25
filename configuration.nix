@@ -52,17 +52,26 @@
     onActivation.cleanup = "zap";  # remove anything not listed here
     onActivation.autoUpdate = true;
     onActivation.extraFlags = [ "--force" ];
+    taps = [
+      "kunchenguid/tap"        # third-party tap for the pi-launcher cask below
+      "automic-vault/isotopes" # third-party tap for the automic-vault cask below
+      "dmno-dev/tap"           # varlock - AI-safe .env workflow
+    ];
     brews = [
       "herdr"
       "gnupg"        # gpg - GPG_TTY export in home.nix initContent
       "pyenv"        # pyenv init in home.nix initContent
+      "libb2"        # blake2 for pyenv-built pythons - CPython's _blake2 module dlopens this
+      "varlock"      # AI-safe .env / secrets workflow
     ];
     casks = [
       "wezterm"
       "claude-code"
-      "codex"        # the `co` alias
-      "gcloud-cli"   # gcloud completion sourced from home.nix initContent
-      "android-ndk"  # ANDROID_NDK_HOME
+      "codex"                       # the `co` alias
+      "gcloud-cli"                  # gcloud completion sourced from home.nix initContent
+      "android-ndk"                 # ANDROID_NDK_HOME
+      "kunchenguid/tap/pi-launcher" # GUI launcher for the Pi coding agent
+      "automic-vault/isotopes/automic-vault" # security layer for dev environments; arm64 + Sonoma or newer
     ];
   };
 }
