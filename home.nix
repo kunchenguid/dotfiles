@@ -16,6 +16,7 @@ in
     lazygit
     neovim
     gh        # github cli
+    glow      # render markdown in the terminal
     # the font everything renders in
     nerd-fonts.jetbrains-mono
   ];
