@@ -1,0 +1,468 @@
+<title>Dotfiles Mind Map</title>
+<style>
+:root {
+  --base: #232136;
+  --surface: #2a273f;
+  --overlay: #393552;
+  --highlight-low: #2a283e;
+  --highlight-med: #44415a;
+  --muted: #6e6a86;
+  --subtle: #908caa;
+  --text: #e0def4;
+  --iris: #c4a7e7;
+  --gold: #f6c177;
+  --love: #eb6f92;
+  --pine: #3e8fb0;
+  --foam: #9ccfd8;
+  --rose: #ea9a97;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--base);
+  color: var(--text);
+  font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(196, 167, 231, 0.08), transparent 45%),
+    radial-gradient(circle at 88% 92%, rgba(234, 154, 151, 0.06), transparent 45%);
+}
+
+.page {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 64px 32px 96px;
+}
+
+header {
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--highlight-med);
+}
+
+.eyebrow {
+  font-family: 'SF Mono', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  color: var(--foam);
+  text-transform: uppercase;
+  margin: 0 0 14px;
+}
+
+h1 {
+  font-family: 'SF Mono', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  margin: 0 0 16px;
+  text-wrap: balance;
+  color: var(--text);
+}
+
+.lede {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--subtle);
+  max-width: 640px;
+  margin: 0;
+}
+
+.lede strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin-top: 28px;
+  font-family: 'SF Mono', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--subtle);
+}
+
+.legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+  flex: none;
+}
+
+figure {
+  margin: 0;
+}
+
+.diagram-scroll {
+  overflow-x: auto;
+  border-radius: 16px;
+  background: var(--highlight-low);
+  border: 1px solid var(--highlight-med);
+  padding: 28px 24px;
+}
+
+.diagram-scroll svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 900px;
+}
+
+figcaption {
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 720px;
+}
+
+footer {
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--highlight-med);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+footer code {
+  font-family: 'SF Mono', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  background: var(--surface);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--subtle);
+  font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+}
+</style>
+
+<div class="page">
+  <header>
+    <p class="eyebrow">kunchenguid/dotfiles &middot; nix-darwin + home-manager</p>
+    <h1>Every tool, one flake</h1>
+    <p class="lede">
+      One <strong>flake.nix</strong> command rebuilds this Mac end to end &mdash;
+      system defaults, Homebrew, shell, editor, terminal, and AI agent configs.
+      This map traces each branch back to the file that declares it, colored
+      with the repo's own <strong>Ros&eacute; Pine Moon</strong> palette.
+    </p>
+    <div class="legend">
+      <span><i style="background:#c4a7e7"></i>Nix Foundation</span>
+      <span><i style="background:#ea9a97"></i>macOS System</span>
+      <span><i style="background:#f6c177"></i>Homebrew Apps</span>
+      <span><i style="background:#9ccfd8"></i>CLI Toolbelt</span>
+      <span><i style="background:#3e8fb0"></i>Shell (zsh)</span>
+      <span><i style="background:#eb6f92"></i>Neovim</span>
+      <span><i style="background:#6dafc4"></i>WezTerm</span>
+      <span><i style="background:#d88bbd"></i>Agent Tooling</span>
+    </div>
+  </header>
+
+  <figure>
+    <div class="diagram-scroll">
+<svg viewBox="0 0 1470 2903" role="img" aria-label="Mind map of every tool and config layer in the dotfiles repo, rooted at dotfiles and branching into Nix Foundation, macOS System, Homebrew Apps, CLI Toolbelt, Shell, Neovim, WezTerm, and Agent Tooling, with Pi as a nested optional layer under Agent Tooling." xmlns="http://www.w3.org/2000/svg">
+<path d="M230.0 1433.0 L265.0 1433.0" stroke="#908caa" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M265.0 239.0 L265.0 2627.0" stroke="#908caa" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M265.0 239.0 L300.0 239.0" stroke="#908caa" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M265.0 559.0 L300.0 559.0" stroke="#908caa" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M265.0 805.0 L300.0 805.0" stroke="#908caa" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M265.0 1162.0 L300.0 1162.0" stroke="#908caa" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M265.0 1556.0 L300.0 1556.0" stroke="#908caa" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M265.0 1987.0 L300.0 1987.0" stroke="#908caa" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M265.0 2381.0 L300.0 2381.0" stroke="#908caa" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M265.0 2627.0 L300.0 2627.0" stroke="#908caa" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M530.0 239.0 L565.0 239.0" stroke="#c4a7e7" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 91.0 L565.0 387.0" stroke="#c4a7e7" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 91.0 L600.0 91.0" stroke="#c4a7e7" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 165.0 L600.0 165.0" stroke="#c4a7e7" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 239.0 L600.0 239.0" stroke="#c4a7e7" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 313.0 L600.0 313.0" stroke="#c4a7e7" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 387.0 L600.0 387.0" stroke="#c4a7e7" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M530.0 559.0 L565.0 559.0" stroke="#ea9a97" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 485.0 L565.0 633.0" stroke="#ea9a97" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 485.0 L600.0 485.0" stroke="#ea9a97" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 559.0 L600.0 559.0" stroke="#ea9a97" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 633.0 L600.0 633.0" stroke="#ea9a97" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M530.0 805.0 L565.0 805.0" stroke="#f6c177" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 731.0 L565.0 879.0" stroke="#f6c177" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 731.0 L600.0 731.0" stroke="#f6c177" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 805.0 L600.0 805.0" stroke="#f6c177" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 879.0 L600.0 879.0" stroke="#f6c177" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M530.0 1162.0 L565.0 1162.0" stroke="#9ccfd8" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 977.0 L565.0 1347.0" stroke="#9ccfd8" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 977.0 L600.0 977.0" stroke="#9ccfd8" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1051.0 L600.0 1051.0" stroke="#9ccfd8" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1125.0 L600.0 1125.0" stroke="#9ccfd8" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1199.0 L600.0 1199.0" stroke="#9ccfd8" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1273.0 L600.0 1273.0" stroke="#9ccfd8" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1347.0 L600.0 1347.0" stroke="#9ccfd8" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M530.0 1556.0 L565.0 1556.0" stroke="#3e8fb0" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1445.0 L565.0 1667.0" stroke="#3e8fb0" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1445.0 L600.0 1445.0" stroke="#3e8fb0" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1519.0 L600.0 1519.0" stroke="#3e8fb0" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1593.0 L600.0 1593.0" stroke="#3e8fb0" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1667.0 L600.0 1667.0" stroke="#3e8fb0" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M530.0 1987.0 L565.0 1987.0" stroke="#eb6f92" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1765.0 L565.0 2209.0" stroke="#eb6f92" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1765.0 L600.0 1765.0" stroke="#eb6f92" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1839.0 L600.0 1839.0" stroke="#eb6f92" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1913.0 L600.0 1913.0" stroke="#eb6f92" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 1987.0 L600.0 1987.0" stroke="#eb6f92" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 2061.0 L600.0 2061.0" stroke="#eb6f92" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 2135.0 L600.0 2135.0" stroke="#eb6f92" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 2209.0 L600.0 2209.0" stroke="#eb6f92" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M530.0 2381.0 L565.0 2381.0" stroke="#6dafc4" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 2307.0 L565.0 2455.0" stroke="#6dafc4" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 2307.0 L600.0 2307.0" stroke="#6dafc4" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 2381.0 L600.0 2381.0" stroke="#6dafc4" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 2455.0 L600.0 2455.0" stroke="#6dafc4" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M530.0 2627.0 L565.0 2627.0" stroke="#d88bbd" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 2553.0 L565.0 2701.0" stroke="#d88bbd" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 2553.0 L600.0 2553.0" stroke="#d88bbd" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 2627.0 L600.0 2627.0" stroke="#d88bbd" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M565.0 2701.0 L600.0 2701.0" stroke="#d88bbd" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M980.0 2701.0 L1015.0 2701.0" stroke="#d88bbd" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M1015.0 2590.0 L1015.0 2812.0" stroke="#d88bbd" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M1015.0 2590.0 L1050.0 2590.0" stroke="#d88bbd" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M1015.0 2664.0 L1050.0 2664.0" stroke="#d88bbd" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M1015.0 2738.0 L1050.0 2738.0" stroke="#d88bbd" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<path d="M1015.0 2812.0 L1050.0 2812.0" stroke="#d88bbd" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+<rect x="40.0" y="1353.0" width="190.0" height="160.0" rx="16" fill="#2a273f" stroke="#e0def4" stroke-width="2"/>
+<text x="135.0" y="1427.0" text-anchor="middle" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:22px;font-weight:700;">dotfiles</text>
+<text x="135.0" y="1453.0" text-anchor="middle" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:10.5px;font-weight:600;letter-spacing:0.8px;">PERSONAL MACOS SETUP</text>
+<text x="135.0" y="1471.0" text-anchor="middle" fill="#6e6a86" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">one repo, one command</text>
+<rect x="300.0" y="203.0" width="230.0" height="72.0" rx="12" fill="#c4a7e7"/>
+<text x="318.0" y="233.0" text-anchor="start" fill="#232136" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:15.5px;font-weight:700;">Nix Foundation</text>
+<text x="318.0" y="253.0" text-anchor="start" fill="#232136" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:9.5px;font-weight:700;letter-spacing:0.6px;">REPRODUCIBLE BUILDS</text>
+<rect x="600.0" y="60.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#c4a7e7" stroke-width="1"/>
+<rect x="600.0" y="60.0" width="4.0" height="62.0" rx="2" fill="#c4a7e7"/>
+<text x="618.0" y="82.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">flake.nix</text>
+<text x="618.0" y="99.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Pins nixpkgs, nix-darwin, home-manager &amp;</text>
+<text x="618.0" y="113.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">nix-homebrew inputs</text>
+<rect x="600.0" y="134.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#c4a7e7" stroke-width="1"/>
+<rect x="600.0" y="134.0" width="4.0" height="62.0" rx="2" fill="#c4a7e7"/>
+<text x="618.0" y="156.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">nix-darwin</text>
+<text x="618.0" y="173.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Declarative macOS system config</text>
+<text x="618.0" y="187.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">(defaults, Homebrew)</text>
+<rect x="600.0" y="208.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#c4a7e7" stroke-width="1"/>
+<rect x="600.0" y="208.0" width="4.0" height="62.0" rx="2" fill="#c4a7e7"/>
+<text x="618.0" y="230.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">home-manager</text>
+<text x="618.0" y="247.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Declarative per-user dotfiles,</text>
+<text x="618.0" y="261.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">packages &amp; symlinks</text>
+<rect x="600.0" y="282.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#c4a7e7" stroke-width="1"/>
+<rect x="600.0" y="282.0" width="4.0" height="62.0" rx="2" fill="#c4a7e7"/>
+<text x="618.0" y="304.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">nix-homebrew</text>
+<text x="618.0" y="321.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Lets Homebrew be driven from</text>
+<text x="618.0" y="335.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">the Nix config</text>
+<rect x="600.0" y="356.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#c4a7e7" stroke-width="1"/>
+<rect x="600.0" y="356.0" width="4.0" height="62.0" rx="2" fill="#c4a7e7"/>
+<text x="618.0" y="378.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Determinate Nix</text>
+<text x="618.0" y="395.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Installs &amp; manages the Nix</text>
+<text x="618.0" y="409.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">daemon itself</text>
+<rect x="300.0" y="523.0" width="230.0" height="72.0" rx="12" fill="#ea9a97"/>
+<text x="318.0" y="553.0" text-anchor="start" fill="#232136" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:15.5px;font-weight:700;">macOS System</text>
+<text x="318.0" y="573.0" text-anchor="start" fill="#232136" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:9.5px;font-weight:700;letter-spacing:0.6px;">CONFIGURATION.NIX</text>
+<rect x="600.0" y="454.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#ea9a97" stroke-width="1"/>
+<rect x="600.0" y="454.0" width="4.0" height="62.0" rx="2" fill="#ea9a97"/>
+<text x="618.0" y="476.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Appearance</text>
+<text x="618.0" y="493.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Dark mode, fast key repeat,</text>
+<text x="618.0" y="507.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">auto-hidden menu bar</text>
+<rect x="600.0" y="528.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#ea9a97" stroke-width="1"/>
+<rect x="600.0" y="528.0" width="4.0" height="62.0" rx="2" fill="#ea9a97"/>
+<text x="618.0" y="550.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Dock &amp; Finder</text>
+<text x="618.0" y="567.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Dock autohide, list view,</text>
+<text x="618.0" y="581.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">no desktop icons</text>
+<rect x="600.0" y="602.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#ea9a97" stroke-width="1"/>
+<rect x="600.0" y="602.0" width="4.0" height="62.0" rx="2" fill="#ea9a97"/>
+<text x="618.0" y="624.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Trackpad</text>
+<text x="618.0" y="641.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Tap to click enabled</text>
+<rect x="300.0" y="769.0" width="230.0" height="72.0" rx="12" fill="#f6c177"/>
+<text x="318.0" y="799.0" text-anchor="start" fill="#232136" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:15.5px;font-weight:700;">Homebrew Apps</text>
+<text x="318.0" y="819.0" text-anchor="start" fill="#232136" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:9.5px;font-weight:700;letter-spacing:0.6px;">ZAP-CLEANED</text>
+<rect x="600.0" y="700.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#f6c177" stroke-width="1"/>
+<rect x="600.0" y="700.0" width="4.0" height="62.0" rx="2" fill="#f6c177"/>
+<text x="618.0" y="722.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">WezTerm (cask)</text>
+<text x="618.0" y="739.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">GPU-accelerated terminal</text>
+<text x="618.0" y="753.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">emulator</text>
+<rect x="600.0" y="774.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#f6c177" stroke-width="1"/>
+<rect x="600.0" y="774.0" width="4.0" height="62.0" rx="2" fill="#f6c177"/>
+<text x="618.0" y="796.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Claude Code (cask)</text>
+<text x="618.0" y="813.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Anthropic&#x27;s coding agent CLI</text>
+<rect x="600.0" y="848.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#f6c177" stroke-width="1"/>
+<rect x="600.0" y="848.0" width="4.0" height="62.0" rx="2" fill="#f6c177"/>
+<text x="618.0" y="870.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">herdr (brew)</text>
+<text x="618.0" y="887.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">CLI session/socket manager</text>
+<rect x="300.0" y="1126.0" width="230.0" height="72.0" rx="12" fill="#9ccfd8"/>
+<text x="318.0" y="1156.0" text-anchor="start" fill="#232136" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:15.5px;font-weight:700;">CLI Toolbelt</text>
+<text x="318.0" y="1176.0" text-anchor="start" fill="#232136" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:9.5px;font-weight:700;letter-spacing:0.6px;">HOME.NIX PACKAGES</text>
+<rect x="600.0" y="946.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#9ccfd8" stroke-width="1"/>
+<rect x="600.0" y="946.0" width="4.0" height="62.0" rx="2" fill="#9ccfd8"/>
+<text x="618.0" y="968.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">ripgrep</text>
+<text x="618.0" y="985.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Fast recursive text search</text>
+<rect x="600.0" y="1020.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#9ccfd8" stroke-width="1"/>
+<rect x="600.0" y="1020.0" width="4.0" height="62.0" rx="2" fill="#9ccfd8"/>
+<text x="618.0" y="1042.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">fd</text>
+<text x="618.0" y="1059.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Fast, friendly file finder</text>
+<rect x="600.0" y="1094.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#9ccfd8" stroke-width="1"/>
+<rect x="600.0" y="1094.0" width="4.0" height="62.0" rx="2" fill="#9ccfd8"/>
+<text x="618.0" y="1116.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">fzf</text>
+<text x="618.0" y="1133.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Fuzzy finder for files &amp;</text>
+<text x="618.0" y="1147.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">history</text>
+<rect x="600.0" y="1168.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#9ccfd8" stroke-width="1"/>
+<rect x="600.0" y="1168.0" width="4.0" height="62.0" rx="2" fill="#9ccfd8"/>
+<text x="618.0" y="1190.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">jq</text>
+<text x="618.0" y="1207.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">JSON processor on the</text>
+<text x="618.0" y="1221.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">command line</text>
+<rect x="600.0" y="1242.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#9ccfd8" stroke-width="1"/>
+<rect x="600.0" y="1242.0" width="4.0" height="62.0" rx="2" fill="#9ccfd8"/>
+<text x="618.0" y="1264.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">lazygit</text>
+<text x="618.0" y="1281.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Terminal UI for git</text>
+<rect x="600.0" y="1316.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#9ccfd8" stroke-width="1"/>
+<rect x="600.0" y="1316.0" width="4.0" height="62.0" rx="2" fill="#9ccfd8"/>
+<text x="618.0" y="1338.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Nerd Font (JetBrains Mono)</text>
+<text x="618.0" y="1355.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Icon-patched font for</text>
+<text x="618.0" y="1369.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">terminal &amp; editor</text>
+<rect x="300.0" y="1520.0" width="230.0" height="72.0" rx="12" fill="#3e8fb0"/>
+<text x="318.0" y="1550.0" text-anchor="start" fill="#232136" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:15.5px;font-weight:700;">Shell (zsh)</text>
+<text x="318.0" y="1570.0" text-anchor="start" fill="#232136" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:9.5px;font-weight:700;letter-spacing:0.6px;">PROGRAMS.ZSH</text>
+<rect x="600.0" y="1414.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#3e8fb0" stroke-width="1"/>
+<rect x="600.0" y="1414.0" width="4.0" height="62.0" rx="2" fill="#3e8fb0"/>
+<text x="618.0" y="1436.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Autosuggestion</text>
+<text x="618.0" y="1453.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Ghost-text completion</text>
+<text x="618.0" y="1467.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">from history</text>
+<rect x="600.0" y="1488.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#3e8fb0" stroke-width="1"/>
+<rect x="600.0" y="1488.0" width="4.0" height="62.0" rx="2" fill="#3e8fb0"/>
+<text x="618.0" y="1510.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Syntax highlighting</text>
+<text x="618.0" y="1527.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Commands turn green</text>
+<text x="618.0" y="1541.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">once valid</text>
+<rect x="600.0" y="1562.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#3e8fb0" stroke-width="1"/>
+<rect x="600.0" y="1562.0" width="4.0" height="62.0" rx="2" fill="#3e8fb0"/>
+<text x="618.0" y="1584.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Starship</text>
+<text x="618.0" y="1601.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Prompt: dir, git branch/status,</text>
+<text x="618.0" y="1615.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">cmd duration</text>
+<rect x="600.0" y="1636.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#3e8fb0" stroke-width="1"/>
+<rect x="600.0" y="1636.0" width="4.0" height="62.0" rx="2" fill="#3e8fb0"/>
+<text x="618.0" y="1658.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Aliases</text>
+<text x="618.0" y="1675.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">cc, co, add, push, pull, m</text>
+<text x="618.0" y="1689.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">shortcuts</text>
+<rect x="300.0" y="1951.0" width="230.0" height="72.0" rx="12" fill="#eb6f92"/>
+<text x="318.0" y="1981.0" text-anchor="start" fill="#232136" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:15.5px;font-weight:700;">Neovim</text>
+<text x="318.0" y="2001.0" text-anchor="start" fill="#232136" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:9.5px;font-weight:700;letter-spacing:0.6px;">EDITOR</text>
+<rect x="600.0" y="1734.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#eb6f92" stroke-width="1"/>
+<rect x="600.0" y="1734.0" width="4.0" height="62.0" rx="2" fill="#eb6f92"/>
+<text x="618.0" y="1756.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">lazy.nvim</text>
+<text x="618.0" y="1773.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Plugin manager, self-bootstraps</text>
+<text x="618.0" y="1787.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">on first launch</text>
+<rect x="600.0" y="1808.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#eb6f92" stroke-width="1"/>
+<rect x="600.0" y="1808.0" width="4.0" height="62.0" rx="2" fill="#eb6f92"/>
+<text x="618.0" y="1830.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">rose-pine (moon)</text>
+<text x="618.0" y="1847.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Colorscheme, transparent bg</text>
+<text x="618.0" y="1861.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">on macOS</text>
+<rect x="600.0" y="1882.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#eb6f92" stroke-width="1"/>
+<rect x="600.0" y="1882.0" width="4.0" height="62.0" rx="2" fill="#eb6f92"/>
+<text x="618.0" y="1904.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Neogit + Diffview</text>
+<text x="618.0" y="1921.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Git status &amp; diff review</text>
+<text x="618.0" y="1935.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">inside the editor</text>
+<rect x="600.0" y="1956.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#eb6f92" stroke-width="1"/>
+<rect x="600.0" y="1956.0" width="4.0" height="62.0" rx="2" fill="#eb6f92"/>
+<text x="618.0" y="1978.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">gitsigns.nvim</text>
+<text x="618.0" y="1995.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Inline change signs &amp;</text>
+<text x="618.0" y="2009.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">line blame</text>
+<rect x="600.0" y="2030.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#eb6f92" stroke-width="1"/>
+<rect x="600.0" y="2030.0" width="4.0" height="62.0" rx="2" fill="#eb6f92"/>
+<text x="618.0" y="2052.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">oil.nvim</text>
+<text x="618.0" y="2069.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Directory-as-buffer</text>
+<text x="618.0" y="2083.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">file browser</text>
+<rect x="600.0" y="2104.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#eb6f92" stroke-width="1"/>
+<rect x="600.0" y="2104.0" width="4.0" height="62.0" rx="2" fill="#eb6f92"/>
+<text x="618.0" y="2126.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">snacks.nvim</text>
+<text x="618.0" y="2143.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Fuzzy picker, notifier,</text>
+<text x="618.0" y="2157.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">LSP goto-definition</text>
+<rect x="600.0" y="2178.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#eb6f92" stroke-width="1"/>
+<rect x="600.0" y="2178.0" width="4.0" height="62.0" rx="2" fill="#eb6f92"/>
+<text x="618.0" y="2200.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">which-key.nvim</text>
+<text x="618.0" y="2217.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Popup cheat sheet for</text>
+<text x="618.0" y="2231.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">leader-key bindings</text>
+<rect x="300.0" y="2345.0" width="230.0" height="72.0" rx="12" fill="#6dafc4"/>
+<text x="318.0" y="2375.0" text-anchor="start" fill="#232136" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:15.5px;font-weight:700;">WezTerm</text>
+<text x="318.0" y="2395.0" text-anchor="start" fill="#232136" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:9.5px;font-weight:700;letter-spacing:0.6px;">TERMINAL</text>
+<rect x="600.0" y="2276.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#6dafc4" stroke-width="1"/>
+<rect x="600.0" y="2276.0" width="4.0" height="62.0" rx="2" fill="#6dafc4"/>
+<text x="618.0" y="2298.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">rose-pine-moon scheme</text>
+<text x="618.0" y="2315.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Colorscheme shared</text>
+<text x="618.0" y="2329.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">with Neovim</text>
+<rect x="600.0" y="2350.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#6dafc4" stroke-width="1"/>
+<rect x="600.0" y="2350.0" width="4.0" height="62.0" rx="2" fill="#6dafc4"/>
+<text x="618.0" y="2372.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">JetBrains Mono, 12pt</text>
+<text x="618.0" y="2389.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Font also shared</text>
+<text x="618.0" y="2403.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">with Neovim</text>
+<rect x="600.0" y="2424.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#6dafc4" stroke-width="1"/>
+<rect x="600.0" y="2424.0" width="4.0" height="62.0" rx="2" fill="#6dafc4"/>
+<text x="618.0" y="2446.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Focus dimming</text>
+<text x="618.0" y="2463.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Blurs &amp; dims background,</text>
+<text x="618.0" y="2477.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">unfocused windows</text>
+<rect x="300.0" y="2591.0" width="230.0" height="72.0" rx="12" fill="#d88bbd"/>
+<text x="318.0" y="2621.0" text-anchor="start" fill="#232136" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:15.5px;font-weight:700;">Agent Tooling</text>
+<text x="318.0" y="2641.0" text-anchor="start" fill="#232136" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:9.5px;font-weight:700;letter-spacing:0.6px;">CLAUDE · CODEX · PI</text>
+<rect x="600.0" y="2522.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#d88bbd" stroke-width="1"/>
+<rect x="600.0" y="2522.0" width="4.0" height="62.0" rx="2" fill="#d88bbd"/>
+<text x="618.0" y="2544.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">AGENTS.md</text>
+<text x="618.0" y="2561.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">One shared instruction file for</text>
+<text x="618.0" y="2575.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Claude, Codex &amp; opencode</text>
+<rect x="600.0" y="2596.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#d88bbd" stroke-width="1"/>
+<rect x="600.0" y="2596.0" width="4.0" height="62.0" rx="2" fill="#d88bbd"/>
+<text x="618.0" y="2618.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Claude settings.json</text>
+<text x="618.0" y="2635.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Statusline, dark-ansi theme,</text>
+<text x="618.0" y="2649.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">sonnet model</text>
+<rect x="600.0" y="2670.0" width="380.0" height="62.0" rx="9" fill="#2a273f" stroke="#d88bbd" stroke-width="1"/>
+<rect x="600.0" y="2670.0" width="4.0" height="62.0" rx="2" fill="#d88bbd"/>
+<text x="618.0" y="2692.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Pi (optional)</text>
+<text x="618.0" y="2709.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Opt-in coding agent,</text>
+<text x="618.0" y="2723.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">installed separately</text>
+<rect x="1050.0" y="2559.0" width="380.0" height="62.0" rx="9" fill="#393552" stroke="#d88bbd" stroke-width="1"/>
+<rect x="1050.0" y="2559.0" width="4.0" height="62.0" rx="2" fill="#d88bbd"/>
+<text x="1068.0" y="2581.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">rose-pine-moon theme</text>
+<text x="1068.0" y="2598.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Clean-room ported to Pi&#x27;s</text>
+<text x="1068.0" y="2612.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">theme schema</text>
+<rect x="1050.0" y="2633.0" width="380.0" height="62.0" rx="9" fill="#393552" stroke="#d88bbd" stroke-width="1"/>
+<rect x="1050.0" y="2633.0" width="4.0" height="62.0" rx="2" fill="#d88bbd"/>
+<text x="1068.0" y="2655.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Calm extension</text>
+<text x="1068.0" y="2672.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Hides tool-call noise,</text>
+<text x="1068.0" y="2686.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">animated working indicator</text>
+<rect x="1050.0" y="2707.0" width="380.0" height="62.0" rx="9" fill="#393552" stroke="#d88bbd" stroke-width="1"/>
+<rect x="1050.0" y="2707.0" width="4.0" height="62.0" rx="2" fill="#d88bbd"/>
+<text x="1068.0" y="2729.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">terminal-status-title.js</text>
+<text x="1068.0" y="2746.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">Spinner, then done-mark</text>
+<text x="1068.0" y="2760.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">in the terminal title</text>
+<rect x="1050.0" y="2781.0" width="380.0" height="62.0" rx="9" fill="#393552" stroke="#d88bbd" stroke-width="1"/>
+<rect x="1050.0" y="2781.0" width="4.0" height="62.0" rx="2" fill="#d88bbd"/>
+<text x="1068.0" y="2803.0" text-anchor="start" fill="#e0def4" style="font-family:'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:600;">Pinned 3rd-party packages</text>
+<text x="1068.0" y="2820.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">web-access, codex-fast-mode,</text>
+<text x="1068.0" y="2834.0" text-anchor="start" fill="#908caa" style="font-family:-apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;">server-compaction (pinned)</text>
+</svg>
+    </div>
+    <figcaption>
+      Root branches read left to right: <strong>dotfiles</strong> fans out into the eight
+      systems declared across <code>flake.nix</code>, <code>configuration.nix</code>, and
+      <code>home.nix</code>. Agent Tooling nests one layer deeper &mdash; Pi is an optional,
+      separately-installed agent whose theme, extensions, and pinned third-party packages
+      hang off it without being part of the core rebuild.
+    </figcaption>
+  </figure>
+
+  <footer>
+    Generated from the repo state on disk: <code>flake.nix</code>, <code>configuration.nix</code>,
+    <code>home.nix</code>, and the config files under <code>home/</code>. Pi and its Launcher are
+    opt-in and installed from their own sources, not vendored by this repository.
+  </footer>
+</div>
