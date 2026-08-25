@@ -3,7 +3,6 @@
 let
   dotfiles = "${config.home.homeDirectory}/.dotfiles";
 in
-
 {
   home.username = user;
   home.homeDirectory = "/Users/${user}";
@@ -16,8 +15,9 @@ in
     jq        # json on the command line
     lazygit
     neovim
+    gh        # github cli
     # the font everything renders in
-    nerd-fonts.hack
+    nerd-fonts.jetbrains-mono
   ];
   fonts.fontconfig.enable = true;
   home.sessionVariables.EDITOR = "nvim";
