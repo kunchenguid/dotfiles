@@ -16,6 +16,8 @@ in
     jq        # json on the command line
     lazygit
     neovim
+    gh        # github cli
+    nodejs    # node, plus the bundled npm and npx
     # the font everything renders in
     nerd-fonts.hack
   ];
@@ -29,6 +31,7 @@ in
     MANPAGER = "less -X";                 # don't clear the screen after quitting a man page
     OBJC_DISABLE_INITIALIZE_FORK_SAFETY = "YES";
     ANDROID_NDK_HOME = "/opt/homebrew/share/android-ndk";
+    NPM_CONFIG_PREFIX = "$HOME/.npm-global";  # nix's npm is read-only; keep global installs out of the store
   };
 
   # Toolchains that install themselves under $HOME rather than through nix.
@@ -37,6 +40,7 @@ in
     "$HOME/.local/bin"
     "$HOME/.cargo/bin"
     "$HOME/.bun/bin"
+    "$HOME/.npm-global/bin"
   ];
 
   programs.zsh = {

@@ -70,6 +70,7 @@
       "codex"                       # the `co` alias
       "gcloud-cli"                  # gcloud completion sourced from home.nix initContent
       "android-ndk"                 # ANDROID_NDK_HOME
+      "opensuperwhisper"            # whisper dictation; prompts for mic + accessibility on first run
       "kunchenguid/tap/pi-launcher" # GUI launcher for the Pi coding agent
       "automic-vault/isotopes/automic-vault" # security layer for dev environments; arm64 + Sonoma or newer
     ];
