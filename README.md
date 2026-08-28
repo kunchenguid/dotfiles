@@ -180,6 +180,16 @@ Both packages execute with your full user permissions and must be trusted like a
 
 Home Manager deliberately does not manage `~/.pi/agent` itself, or Pi authentication, sessions, trust decisions, caches, npm/git package trees, or any other runtime state. The model overrides contain no credentials or endpoint settings, do not choose a default model, and only take effect after you authenticate Pi yourself. This remains an additive post-video layer: it does not install Pi, a launcher, or package source code into this repository.
 
+## Optional agentic toolkit
+
+A handful of [kunchenguid](https://github.com/kunchenguid) tools built for AI-assisted development - `treehouse`, `no-mistakes`, `gnhf`, `lavish-axi`, `gh-axi`, and `firstmate` - aren't Homebrew formulae/casks, so `rebuild.sh` can't install or restore them. They're personal, opt-in additions, not vendored by this config. Install (or reinstall on a new Mac) with:
+
+```sh
+./tools.sh
+```
+
+Safe to re-run - it skips anything already installed. `firstmate` is cloned to `~/dev/firstmate` but never auto-started; `cd` into it and run your agent CLI there when you want to use it.
+
 ## Notes
 
 The first time you launch `nvim`, it bootstraps [lazy.nvim](https://github.com/folke/lazy.nvim) by cloning plugins from GitHub.
