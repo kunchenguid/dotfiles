@@ -28,18 +28,32 @@
   nix-homebrew = {
     enable = true;
     inherit user;
+    autoMigrate = true;
   };
   homebrew = {
     enable = true;
     onActivation.cleanup = "zap";  # remove anything not listed here
     onActivation.autoUpdate = true;
     onActivation.extraFlags = [ "--force" ];
+    taps = [
+      "supabase/tap"
+    ];
     brews = [
       "herdr"
+      "gh"
+      "neovim"
+      "pnpm"
+      "sox"
+      "supabase/tap/supabase"
+      "vercel"
+      "whisper-cpp"
     ];
     casks = [
       "wezterm"
       "claude-code"
+      "opensuperwhisper"
+      "visual-studio-code"
+      "battery"
     ];
   };
 }

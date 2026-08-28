@@ -40,6 +40,22 @@ in
     };
   };
 
+  programs.git = {
+    enable = true;
+    settings = {
+      user.name = "Jakob";
+      user.email = "jakobsteen14@gmail.com";
+      core.editor = "code --wait";
+      diff.tool = "vscode";
+      "difftool \"vscode\"".cmd = "code --wait --diff $LOCAL $REMOTE";
+      merge.tool = "vscode";
+      "mergetool \"vscode\"".keepBackup = false;
+      difftool.prompt = false;
+      "credential \"https://github.com\"".helper = [ "" "!/opt/homebrew/bin/gh auth git-credential" ];
+      "credential \"https://gist.github.com\"".helper = [ "" "!/opt/homebrew/bin/gh auth git-credential" ];
+    };
+  };
+
   programs.starship = {
     enable = true;
     settings = {
