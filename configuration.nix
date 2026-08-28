@@ -45,6 +45,7 @@
       "pnpm"
       "sox"
       "supabase/tap/supabase"
+      "tmux"
       "vercel"
       "whisper-cpp"
     ];
