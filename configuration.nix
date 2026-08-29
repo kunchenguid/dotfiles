@@ -30,6 +30,16 @@
     inherit user;
     autoMigrate = true;
   };
+  # nix-homebrew only symlinks Library/Homebrew into the Nix store, not the
+  # top-level `completions` dir. That leaves Homebrew's own zsh completion
+  # symlinks dangling (e.g. share/zsh/site-functions/_brew ->
+  # ../../../completions/zsh/_brew), which makes every new zsh session print
+  # compinit errors. Recreate the missing symlink on every activation, since
+  # nix-homebrew rebuilds /opt/homebrew/Library from scratch each time.
+  system.activationScripts.postActivation.text = ''
+    brew_store_dir="$(dirname "$(dirname "$(readlink -f /opt/homebrew/Library/Homebrew)")")"
+    ln -sfn "$brew_store_dir/completions" /opt/homebrew/completions
+  '';
   homebrew = {
     enable = true;
     onActivation.cleanup = "zap";  # remove anything not listed here
