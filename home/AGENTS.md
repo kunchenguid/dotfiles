@@ -13,6 +13,7 @@
 - Apply that same high standard to engineering excellence: lint, test failures, and test flakiness.
   If you see one, even if it is not caused by what you are working on right now, still get it fixed.
 - Before using "dynamic workflows", "ultra code" or any harness feature that immediately spawns a large swarm of subagents, always explain the tradeoffs and ask the user for explicit approval.
+- For any project that spans multiple sessions, set up a living `docs/HANDOFF.md` status file (template: `~/dotfiles/templates/HANDOFF.md.template`), referenced from the project's AGENTS.md/CLAUDE.md so a fresh session finds it automatically. Edit its SESSION STATUS section in place at the end of a work session - never leave it stale, and never just append a new dated entry instead of updating it.
 
 ## Maintaining this file
 

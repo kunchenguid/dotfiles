@@ -1,0 +1,86 @@
+<!--
+HOW TO USE THIS TEMPLATE
+=========================
+Copy this file into a project as docs/HANDOFF.md (or PLAN.md - pick one
+name and stick with it), fill in the sections, and commit it. Then point
+a new Claude Code session at it automatically by adding one line to the
+project's AGENTS.md / CLAUDE.md:
+
+    See docs/HANDOFF.md for current status before starting work.
+
+The whole point is that a brand new session - or a different AI, or you
+six months from now - can read this one file and know exactly where
+things stand, with zero re-explaining.
+
+THE ONE RULE THAT MAKES THIS WORK: the "SESSION STATUS" section is
+EDITED IN PLACE every time a session finishes meaningful work, not
+appended to. A stale status section is worse than none at all - it
+actively misleads the next session. If you're the one closing out a
+work session, updating this file is the last thing you do, not an
+afterthought.
+
+Delete this comment block once you've copied the template into a real
+project.
+-->
+
+# <Project name> — Implementation Plan / Handoff
+
+## SESSION STATUS — read this first if you're a new session picking this up
+
+**Working directory / repo**: where the code actually lives, if it's not
+obvious from where this file sits.
+
+**Live infra already set up** (don't recreate): databases, deployed
+services, API keys/where they live, third-party project refs. Anything
+a fresh session might otherwise try to re-provision from scratch.
+
+**Status by phase/milestone** (✅ done / 🔶 partial / ⬜ not started):
+- ✅ Phase 0 — one line on what "done" means here and how it was verified.
+- 🔶 Phase 1 — what's built, what's still missing, in one or two lines.
+
+**In-progress work not yet on the main branch** (if any): branch name,
+what's on it, why it's deliberately unmerged (e.g. "needs a human to
+spot-check real content before it ships"), and what needs to happen for
+it to merge. Delete this subsection if everything is already on main.
+
+**Known blockers / lessons learned**: anything that failed once and
+would fail again if repeated the same way. State the failure and the
+fix as a rule for next time, not just a narrative - e.g. "don't run N
+generation batches in parallel, they share a rate limit; run them
+sequentially instead." This is the section that saves the next session
+from re-discovering the same problem the hard way.
+
+**Next up**: the next concrete action, not a vague "continue development."
+
+## Original objective (verbatim, if there was one)
+
+Paste the user's original ask here unedited, if the project started from
+a specific request. Keeps later sessions honest about what was actually
+asked for vs. what's been added since.
+
+## Context / decisions log
+
+The "why" behind non-obvious choices - tech stack picks, things ruled
+out and why, constraints that shaped the design. This is what stops a
+future session from re-litigating a decision that was already made
+deliberately.
+
+## Architecture / data model
+
+Whatever a new session needs to orient itself in the code: key
+directories, data model, how the pieces fit together. Skip anything
+that's already obvious from the code itself - this section is for
+things that aren't.
+
+## Phased build order
+
+The plan, broken into verifiable phases. Each phase should have a
+concrete "verify" step - not "it's done" but "here's how you'd confirm
+it's done."
+
+## Risks to keep in mind
+
+Standing risks that don't go away when a phase is marked done - cost
+implications, things that are "not a bug, expected behavior," fragile
+external dependencies, anything a future session might mistake for a
+bug and try to "fix."
