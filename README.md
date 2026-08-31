@@ -30,6 +30,7 @@ Running the switch builds:
 - Editor (Neovim config with the rose-pine moon theme)
 - Terminal (WezTerm config with the rose-pine moon theme and dimmed unfocused windows)
 - Agent configs (Claude, Codex, opencode all share one AGENTS.md)
+- A public Agent Skills library under `home/skills/` (238 `SKILL.md` folders you can copy or `npx skills add`)
 - Optional Pi theme and local extensions, generic UI settings and model overrides, plus two deliberately pinned third-party Pi packages
 
 ## Prerequisites
@@ -138,6 +139,27 @@ If you don't use it, just remove it from `brews` in your copy.
 - `rebuild.sh` - re-applies the config after the first switch.
   Run this every time you make a change.
 - `home/` - the actual config files that get symlinked into place; the sections below explain the shared symlink model and Pi's narrower selective setup.
+- `home/skills/` - the published Agent Skills library (see the section below). This public Nix config does not auto-link those folders into IDEs.
+- `docs/skills-library.md` - what was excluded from that library, and how agentskills.io listing actually works.
+
+## Agent skills library
+
+These dotfiles also ship a library of Agent Skills: folders of instructions that compatible coding agents load when a task matches the skill. Each skill is a directory under `home/skills/` with a `SKILL.md` (name, description, and the procedure), sometimes plus scripts or reference files. They follow the [Agent Skills spec](https://agentskills.io/specification). Fork the repo and copy the skills you want; this public Home Manager config does not install them into Claude, Codex, or Cursor for you.
+
+### For agents
+
+- Catalog: `home/skills/<skill-name>/SKILL.md`. Required frontmatter: `name`, `description`. Optional: `scripts/`, `references/`, `assets/`.
+- Do not rewrite skill bodies. Treat each published skill as source.
+- List or install from GitHub after this tree is on `main`:
+
+```sh
+npx skills add kunchenguid/dotfiles --list
+npx skills add kunchenguid/dotfiles --skill axi -g -a claude-code -y
+```
+
+- One-off use without the CLI: copy `home/skills/<name>/` into the agent's skills directory (for example `~/.claude/skills/<name>/`).
+- Exclusions, the x402 binary ignore, and the agentskills.io listing situation: `docs/skills-library.md`.
+- `home/skills/README.md` is the short in-tree copy of this contract.
 
 ## How the symlinks work
 

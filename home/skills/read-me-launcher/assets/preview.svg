@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="620" viewBox="0 0 1180 620" role="img" aria-label="README preview">
+  <defs>
+    <linearGradient id="desk" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1180" height="620" fill="url(#desk)"/>
+  <rect x="70" y="40" width="1040" height="540" rx="20" fill="#0b1220" stroke="#334155" stroke-width="2"/>
+  <rect x="70" y="40" width="1040" height="48" rx="20" fill="#020617"/>
+  <rect x="70" y="68" width="1040" height="20" fill="#020617"/>
+  <circle cx="102" cy="64" r="7" fill="#f87171"/>
+  <circle cx="126" cy="64" r="7" fill="#fbbf24"/>
+  <circle cx="150" cy="64" r="7" fill="#34d399"/>
+  <text x="180" y="69" fill="#64748b" font-family="Menlo, Consolas, monospace" font-size="13">README.md � product front door</text>
+  <rect x="70" y="88" width="1040" height="4" fill="url(#bar)"/>
+  <text x="110" y="140" fill="#2dd4bf" font-family="Menlo, Consolas, monospace" font-size="14" letter-spacing="2">LAUNCHED BY READ-ME-LAUNCHER</text>
+  <text x="110" y="188" fill="#f8fafc" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">Ship a front door people trust</text>
+  <text x="110" y="226" fill="#94a3b8" font-family="Arial, Helvetica, sans-serif" font-size="18">Hero. Pitch. Real install. Zero credential leaks.</text>
+  <rect x="110" y="258" width="960" height="88" rx="14" fill="#020617" stroke="#1e293b" stroke-width="1.5"/>
+  <text x="134" y="294" fill="#e2e8f0" font-family="Menlo, Consolas, monospace" font-size="16"><tspan fill="#2dd4bf">$ </tspan>gh skill install thatdudealso/read-me-launcher</text>
+  <text x="134" y="322" fill="#64748b" font-family="Menlo, Consolas, monospace" font-size="15"># ask: launch a stunning README for this repo</text>
+  <rect x="110" y="390" width="960" height="120" rx="16" fill="#111827" stroke="#2dd4bf" stroke-opacity="0.45" stroke-width="1.5"/>
+  <text x="140" y="440" fill="#f8fafc" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">Flashy where it counts. Reliable where GitHub is picky.</text>
+  <text x="140" y="478" fill="#94a3b8" font-family="Arial, Helvetica, sans-serif" font-size="16">PNG heroes for camo. Inline SVG fallbacks. Lint before ship.</text>
+</svg>

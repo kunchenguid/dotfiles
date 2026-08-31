@@ -1,0 +1,4 @@
+interface:
+  display_name: "Read Me Launcher"
+  short_description: "Repo-grounded, evidence-first README generation + lint"
+  default_prompt: "Inspect this repo, classify interface/audience/primary proof, write a README whose install/run claims match reality, use minimum honest evidence (code or visuals), keep fences outside HTML divs, and run check-readme.sh."

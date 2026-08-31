@@ -17,3 +17,6 @@ result-*
 
 # no-mistakes local validation state - never commit in this public repo
 .no-mistakes/
+
+# x402curl binary (downloaded; not source)
+home/skills/x402/scripts/x402curl

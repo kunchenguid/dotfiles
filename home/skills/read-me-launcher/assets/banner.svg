@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="480" viewBox="0 0 1440 480" role="img" aria-label="read-me-launcher">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="55%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#115e59"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#67e8f9"/>
+    </linearGradient>
+    <radialGradient id="orb" cx="82%" cy="22%" r="42%">
+      <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1440" height="480" fill="url(#bg)"/>
+  <rect width="1440" height="480" fill="url(#orb)"/>
+  <circle cx="1180" cy="90" r="150" fill="#22d3ee" fill-opacity="0.1"/>
+  <circle cx="220" cy="390" r="120" fill="#2dd4bf" fill-opacity="0.1"/>
+  <rect x="88" y="128" width="10" height="84" rx="5" fill="url(#accent)"/>
+  <text x="120" y="120" fill="#99f6e4" font-family="Arial, Helvetica, sans-serif" font-size="16" letter-spacing="3">AGENT SKILL � README CRAFT</text>
+  <text x="120" y="190" fill="#f8fafc" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700">read-me-launcher</text>
+  <text x="120" y="245" fill="#cbd5e1" font-family="Arial, Helvetica, sans-serif" font-size="26">Front doors so good developers stop scrolling.</text>
+  <rect x="120" y="292" width="420" height="44" rx="22" fill="#0f172a" stroke="#2dd4bf" stroke-width="1.5"/>
+  <text x="148" y="320" fill="#ccfbf1" font-family="Menlo, Consolas, monospace" font-size="16">PNG-safe � secret-safe � gh skill</text>
+  <rect x="0" y="470" width="1440" height="10" fill="url(#accent)"/>
+</svg>

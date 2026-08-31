@@ -1,0 +1,6 @@
+{
+  "name": "demo-lib",
+  "version": "1.0.0",
+  "scripts": { "test": "node -e \"process.exit(0)\"" },
+  "main": "index.js"
+}

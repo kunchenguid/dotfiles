@@ -1,0 +1,5 @@
+{
+  "name": "demo-cli",
+  "bin": { "demo-cli": "bin.js" },
+  "scripts": { "start": "node bin.js" }
+}

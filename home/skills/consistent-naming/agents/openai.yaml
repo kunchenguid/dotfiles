@@ -1,0 +1,4 @@
+interface:
+  display_name: "Consistent Naming"
+  short_description: "Name projects/files to match existing structure"
+  default_prompt: "Propose a name that matches this repo's existing naming patterns. Survey neighbors first; no random names."

@@ -1,0 +1,3 @@
+services:
+  api:
+    image: example/api:latest
