@@ -7,7 +7,9 @@ return {
   {
     'lewis6991/gitsigns.nvim',
     event = 'BufWinEnter',
-    opts = { current_line_blame = true },  -- who last touched this line
+    -- current_line_blame's eol virtual text on a wrapped line triggers a
+    -- herdr redraw/ghosting bug; use `:Gitsigns blame_line` on demand instead
+    keys = { { '<leader>gb', function() require('gitsigns').blame_line() end, desc = 'Blame Line' } },
   },
 }
 

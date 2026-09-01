@@ -118,7 +118,7 @@ automatic update.
 | **lazy.nvim** | The plugin manager. Bootstraps itself by cloning from GitHub on first launch (needs network once, then works offline). |
 | **rose-pine (moon variant)** | The colorscheme — italics off, transparent background on macOS/Windows/WSL so it matches the terminal. Shared visually with WezTerm and (separately, hand-ported) Pi. |
 | **Neogit + Diffview + plenary.nvim** | A full git UI inside the editor — status, staging, commits, diff review — bound to `<leader>g`. |
-| **gitsigns.nvim** | Inline change markers in the gutter plus current-line git blame. |
+| **gitsigns.nvim** | Inline change markers in the gutter, plus on-demand git blame for the current line (`<leader>gb`). |
 | **oil.nvim** | A file browser that treats a directory listing as an editable buffer; shows hidden files; bound to `<leader>e`. |
 | **snacks.nvim** | Fuzzy picker (`<leader>f` files, `<leader>s` grep, `<leader>b` buffers), a notifier, and LSP "goto definition" (`gd`). |
 | **which-key.nvim** | Pops up a cheat sheet of what each leader-key combo does, so bindings don't have to be memorized. |
@@ -158,3 +158,164 @@ register.
 | **terminal-status-title.js** | Shows a spinner in the terminal title while Pi is working, then a completion mark with the session name or current directory once it's done. |
 | **Pinned third-party packages** (in `home/.pi/agent/settings.json`) | `npm:pi-web-access@0.14.0`, `npm:@ryan_nookpi/pi-extension-codex-fast-mode@0.2.6`, and `git:github.com/algal/pi-openai-server-compaction@<commit>` — each pinned to an exact, immutable version or commit. Pi installs missing pinned packages automatically at startup (on Pi 0.82.0+), but the pins themselves only move via a deliberate, security-audited edit to this file. The compaction package is explicitly experimental and sends compaction/continuity data to OpenAI. |
 | **models.json** | Context-window overrides (272,000 tokens) for three `openai-codex` provider models used through Pi's `codex-fast-mode` package. No credentials, endpoints, or default-model choice — it only takes effect after you authenticate Pi yourself. |
+
+---
+
+## Hotkeys Quick Reference
+
+Every custom keybinding declared in this repo, grouped by tool. WezTerm itself
+declares no custom key table in `wezterm.lua` - it only sets appearance and
+focus-dimming behavior - so its hotkeys are just whatever WezTerm ships by
+default.
+
+### Shell (zsh)
+
+| Key | Action |
+|---|---|
+| `Ctrl+F` | Accept the current autosuggestion (ghost text from history). |
+
+Aliases (not hotkeys, but muscle memory either way): `..` (up a dir), `add`
+(`git add .`), `push`/`pull`, `m` (checkout `main`), `cc` (`claude
+--dangerously-skip-permissions`), `co` (`codex --full-auto`).
+
+### herdr (pane/session manager) - prefix `Ctrl+B`
+
+Every binding below is pressed *after* the prefix, e.g. `Ctrl+B` then `h`.
+
+| Key (after prefix) | Action |
+|---|---|
+| `h` | Focus pane left |
+| `j` | Focus pane down |
+| `k` | Focus pane up |
+| `l` | Focus pane right |
+| `"` (shift+`'`) | Split pane horizontally |
+| `%` (shift+`5`) | Split pane vertically |
+| `c` | New tab |
+| `&` (shift+`7`) | Close tab |
+| `w` | Workspace picker |
+| `g` | Goto |
+| `y` | Enter copy-mode |
+
+Inside copy-mode (fixed, not configurable): `v`/`Space` to select, `y`/`Enter`
+to copy, `q`/`Esc` to cancel.
+
+### Neovim - leader is `Space`
+
+| Key | Action |
+|---|---|
+| `Esc` (normal mode) | Save the file |
+| `Ctrl+A` (normal mode) | Select all (`ggVG`) |
+| `p` (visual mode, over a selection) | Paste without clobbering the clipboard register |
+| `<leader>g` (`Space g`) | Open Neogit (git status/stage/commit/diff UI) |
+| `<leader>gb` (`Space g b`) | Show git blame for the current line, on demand |
+| `<leader>e` (`Space e`) | Open Oil file browser |
+| `<leader>f` (`Space f`) | Fuzzy-find files (snacks.nvim picker) |
+| `<leader>s` (`Space s`) | Grep search text (snacks.nvim picker) |
+| `<leader>b` (`Space b`) | Fuzzy-find open buffers |
+| `gd` | Goto LSP definition |
+| `Space` (any leader combo, held) | which-key.nvim pops up a cheat sheet of what follows |
+
+Mouse is disabled in Neovim (`o.mouse = ''`) so Herdr keeps host mouse capture
+and `Escape` isn't swallowed - use the keys above instead of clicking.
+
+### Neovim - standard editing commands (built-in vim, not repo config)
+
+Everything below is stock Vim/Neovim behavior, not something this repo
+configures - but it's the muscle memory an IDE gives you for free, so it's
+worth having in one place. All modal: press `i`/`a`/`v`/etc. to enter a mode,
+`Esc` to return to normal mode (where these run).
+
+**Undo / redo**
+
+| Key | Action |
+|---|---|
+| `u` | Undo |
+| `Ctrl+R` | Redo |
+| `.` | Repeat the last change |
+
+**Delete / change**
+
+| Key | Action |
+|---|---|
+| `dd` | Delete (cut) the current line |
+| `D` | Delete to end of line |
+| `dw` | Delete a word |
+| `x` | Delete the character under the cursor |
+| `cc` | Change (delete + insert) the current line |
+| `cw` | Change a word |
+| `ciw` | Change the word under the cursor, wherever the cursor sits in it |
+| `ci(` / `ci"` / `ci{` etc. | Change inside brackets/quotes/braces |
+
+**Copy (yank) / paste**
+
+| Key | Action |
+|---|---|
+| `yy` | Yank (copy) the current line |
+| `yw` | Yank a word |
+| `p` | Paste after the cursor / current line |
+| `P` | Paste before the cursor / current line |
+
+Since `o.clipboard = 'unnamedplus'` is set in this config, every yank/delete
+also lands on the system clipboard - so `Cmd+C`/`Cmd+V` from outside Neovim
+interoperate with `y`/`p` inside it.
+
+**Insert mode**
+
+| Key | Action |
+|---|---|
+| `i` | Insert before the cursor |
+| `a` | Insert (append) after the cursor |
+| `I` | Insert at start of line |
+| `A` | Insert (append) at end of line |
+| `o` | Open a new line below and insert |
+| `O` | Open a new line above and insert |
+| `Esc` | Leave insert mode - and, in this config, saves the file (see above) |
+
+**Navigation**
+
+| Key | Action |
+|---|---|
+| `h` `j` `k` `l` | Left / down / up / right |
+| `w` / `b` | Jump forward / back a word |
+| `0` / `$` | Start / end of line |
+| `gg` / `G` | Start / end of file |
+| `{n}G` or `{n}gg` | Jump to line `{n}` |
+| `Ctrl+D` / `Ctrl+U` | Half-page down / up |
+| `%` | Jump to matching bracket/paren |
+| `*` | Jump to next occurrence of the word under the cursor |
+
+**Search & replace**
+
+| Key | Action |
+|---|---|
+| `/text` then Enter | Search forward for `text` |
+| `?text` then Enter | Search backward |
+| `n` / `N` | Repeat search forward / backward |
+| `:%s/old/new/g` | Replace every `old` with `new` in the file |
+| `:%s/old/new/gc` | Same, but confirm each replacement |
+
+**Visual mode (selecting)**
+
+| Key | Action |
+|---|---|
+| `v` | Start character-wise visual selection |
+| `V` | Start line-wise visual selection |
+| `Ctrl+V` | Start block (column) visual selection |
+| `Ctrl+A` (normal mode) | Select the whole file (repo binding: `ggVG`) |
+| `y` (in visual mode) | Yank the selection |
+| `d` (in visual mode) | Delete the selection |
+| `>` / `<` (in visual mode) | Indent / outdent the selection |
+
+**Windows / splits & buffers**
+
+| Key | Action |
+|---|---|
+| `:vsplit` / `:split` | Split the window vertically / horizontally |
+| `Ctrl+W` then `h/j/k/l` | Move focus between splits |
+| `:bnext` / `:bprev` | Next / previous buffer |
+| `:q` | Close the current window/buffer |
+| `:wq` | Save and close |
+
+For files and fuzzy search specifically, prefer this repo's own bindings
+(`<leader>f`, `<leader>s`, `<leader>b`, `<leader>e` above) over `:e`/`:ls` -
+they're faster and cover the same ground.
