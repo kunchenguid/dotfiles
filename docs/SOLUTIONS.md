@@ -88,7 +88,7 @@ automatic update.
 |---|---|
 | **WezTerm** (cask) | The terminal emulator — see the WezTerm section below. |
 | **Claude Code** (cask) | Anthropic's coding-agent CLI; this is the `claude` binary the `cc` alias runs. |
-| **herdr** (brew) | A terminal session/pane manager (config at `home/.config/herdr/config.toml`): tmux-style pane splits and tab/workspace switching under a `ctrl+b` prefix, plus an agent-aware panel that groups running agents by workspace ("space") rather than by priority. |
+| **herdr** (brew) | A terminal session/pane manager (config at `home/.config/herdr/config.toml`): tmux-style pane splits and tab/workspace switching under a `ctrl+space` prefix, plus an agent-aware panel that groups running agents by workspace ("space") rather than by priority. |
 
 ## CLI Toolbelt — `home.nix` packages
 
@@ -178,9 +178,9 @@ Aliases (not hotkeys, but muscle memory either way): `..` (up a dir), `add`
 (`git add .`), `push`/`pull`, `m` (checkout `main`), `cc` (`claude
 --dangerously-skip-permissions`), `co` (`codex --full-auto`).
 
-### herdr (pane/session manager) - prefix `Ctrl+B`
+### herdr (pane/session manager) - prefix `Ctrl+Space`
 
-Every binding below is pressed *after* the prefix, e.g. `Ctrl+B` then `h`.
+Every binding below is pressed *after* the prefix, e.g. `Ctrl+Space` then `h`.
 
 | Key (after prefix) | Action |
 |---|---|

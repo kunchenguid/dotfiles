@@ -1,5 +1,5 @@
 [keys]
-prefix = "ctrl+b"
+prefix = "ctrl+space"
 focus_pane_left  = "prefix+h"
 focus_pane_down  = "prefix+j"
 focus_pane_up    = "prefix+k"
