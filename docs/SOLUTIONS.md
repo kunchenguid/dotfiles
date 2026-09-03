@@ -188,13 +188,18 @@ Every binding below is pressed *after* the prefix, e.g. `Ctrl+Space` then `h`.
 | `j` | Focus pane down |
 | `k` | Focus pane up |
 | `l` | Focus pane right |
-| `"` (shift+`'`) | Split pane horizontally |
-| `%` (shift+`5`) | Split pane vertically |
+| `↓` (Down) | Split pane horizontally (stacked, new pane below) |
+| `→` (Right) | Split pane vertically (side-by-side, new pane on the right) |
+| `q` | Close the focused pane |
 | `c` | New tab |
 | `&` (shift+`7`) | Close tab |
 | `w` | Workspace picker |
 | `g` | Goto |
 | `y` | Enter copy-mode |
+
+herdr only has two split primitives - horizontal (stacked) and vertical
+(side-by-side) - not four independent directional splits, so only `↓` and `→`
+are bound; `←`/`↑` are left free.
 
 Inside copy-mode (fixed, not configurable): `v`/`Space` to select, `y`/`Enter`
 to copy, `q`/`Esc` to cancel.
