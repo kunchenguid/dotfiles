@@ -17,11 +17,15 @@ in
     neovim
     gh        # github cli
     glow      # render markdown in the terminal
+    nodejs    # npm, for installing Pi and other npm-based CLIs
     # the font everything renders in
     nerd-fonts.jetbrains-mono
   ];
   fonts.fontconfig.enable = true;
   home.sessionVariables.EDITOR = "nvim";
+  # nodejs comes from the read-only Nix store, so npm's global installs
+  # (e.g. `npm install -g`) need a writable prefix outside it.
+  home.sessionPath = [ "${config.home.homeDirectory}/.npm-global/bin" ];
 
   programs.zsh = {
     enable = true;
