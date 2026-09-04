@@ -100,6 +100,9 @@ automatic update.
 | **jq** | JSON processor for the command line. |
 | **lazygit** | Terminal UI for git — stage, commit, branch, rebase without leaving the terminal. |
 | **Neovim** | The editor itself — see below. |
+| **gh** | GitHub CLI. |
+| **glow** | Render markdown in the terminal. |
+| **nodejs** | npm, for installing Pi and other npm-based CLIs. |
 | **Nerd Font (JetBrains Mono)** | Icon-patched monospace font, shared by the terminal and the editor so devicon/statusline glyphs render correctly. `fonts.fontconfig.enable = true` makes it available system-wide. |
 
 ## Shell — `programs.zsh`
@@ -176,7 +179,9 @@ default.
 
 Aliases (not hotkeys, but muscle memory either way): `..` (up a dir), `add`
 (`git add .`), `push`/`pull`, `m` (checkout `main`), `cc` (`claude
---dangerously-skip-permissions`), `co` (`codex --full-auto`).
+--dangerously-skip-permissions`), `co` (`codex --full-auto`), `reload` (unsets
+the `__HM_*_SESS_VARS_SOURCED` guards and re-execs zsh, for shells - herdr
+panes especially - that predate a rebuild and are stuck on a stale `PATH`).
 
 ### herdr (pane/session manager) - prefix `Ctrl+Space`
 

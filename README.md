@@ -25,12 +25,12 @@ Running the switch builds:
 
 - System settings (dark mode, key repeat, dock, Finder, trackpad)
 - Homebrew apps (casks and CLI tools)
-- Nix user packages (ripgrep, fd, fzf, jq, lazygit, Neovim, Hack Nerd Font)
+- Nix user packages (ripgrep, fd, fzf, jq, lazygit, Neovim, gh, glow, nodejs, Hack Nerd Font)
 - Shell (zsh, aliases, starship prompt)
 - Editor (Neovim config with the rose-pine moon theme)
 - Terminal (WezTerm config with the rose-pine moon theme and dimmed unfocused windows)
 - Agent configs (Claude, Codex, opencode all share one AGENTS.md)
-- Optional Pi theme and local extensions, generic UI settings and model overrides, plus two deliberately pinned third-party Pi packages
+- Optional Pi theme and local extensions, generic UI settings and model overrides, plus three deliberately pinned third-party Pi packages
 
 ## Prerequisites
 
@@ -88,6 +88,11 @@ Edit the config files in place, then apply:
 That's it.
 No separate build-and-copy step.
 
+**If a rebuild adds something to your `PATH` or session variables** (like `home.sessionPath` or `home.sessionVariables`), open a brand new terminal window to pick it up - not just a new tab or pane in an already-running terminal/multiplexer.
+Every zsh session guards its env setup with `__HM_SESS_VARS_SOURCED`/`__HM_ZSH_SESS_VARS_SOURCED` so it only sources it once; a shell whose process tree existed before the rebuild has already set those guards and inherits them, so it silently keeps the old `PATH` forever, even across `exec zsh`.
+This bites hardest in a persistent terminal multiplexer (like `herdr`): its server process captures its environment once at startup, and every pane/tab it spawns afterward inherits that same stale environment - a new tab doesn't help, only restarting the server does.
+If quitting the terminal app (or restarting the multiplexer server) entirely isn't convenient, run the `reload` alias in the stale shell instead - it unsets both guards and re-execs zsh so it picks up the current `PATH`.
+
 ## Make it yours
 
 This repo is mine.
@@ -128,6 +133,7 @@ If you don't use it, just remove it from `brews` in your copy.
   If you clone this repo, you'd silently inherit my agent instructions - edit or delete `home/AGENTS.md` if you don't want that.
 - The `cc` and `co` shell aliases in `home.nix` are high-agency shortcuts: `claude --dangerously-skip-permissions` and `codex --full-auto`.
   They're convenient for me, but know what they do before you use them.
+- The `reload` shell alias in `home.nix` fixes the stale-`PATH` issue described above in place, without closing the shell.
 
 ## Repo tour
 
@@ -169,10 +175,11 @@ When enabled, Calm hides collapsed thinking and the call/result shells for Pi's 
 
 Calm never changes prompts, tool execution, model context, session data, or ordering. `/share` and `/export` use the complete stock transcript. Generic custom tools, images, and unsupported Pi transcript classes deliberately remain visible because Pi has no safe general-purpose transcript filter. If a future Pi release no longer exports the exact collapsed-thinking rendering seam, Calm logs one diagnostic and leaves only that adapter disabled; all other behavior remains available.
 
-Pi's package system declares two third-party sources in the linked global `settings.json`:
+Pi's package system declares three third-party sources in the linked global `settings.json`:
 
 - `npm:@ryan_nookpi/pi-extension-codex-fast-mode@0.2.6` - the exact public npm release from `ryan_nookpi`.
 - `git:github.com/algal/pi-openai-server-compaction@c6d593087709e9481223dc6c6c2269b371b5e055` - the exact public `algal` commit for experimental OpenAI server-side compaction.
+- `npm:pi-web-access@0.14.0` - the exact public npm release for Pi's web-access extension.
 
 The version and commit are immutable pins, so Pi does not move them during package updates. Deliberate updates require a new source and security audit, followed by an explicit pin change in `home/.pi/agent/settings.json`. On Pi 0.82.0, global settings declarations install missing pinned packages automatically at startup. No one-time install command is required. Pi keeps the downloaded npm and git package trees in its own unmanaged `~/.pi/agent/npm` and `~/.pi/agent/git` runtime directories, outside Home Manager and Git tracking.
 

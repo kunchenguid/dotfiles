@@ -25,7 +25,10 @@ in
   home.sessionVariables.EDITOR = "nvim";
   # nodejs comes from the read-only Nix store, so npm's global installs
   # (e.g. `npm install -g`) need a writable prefix outside it.
-  home.sessionPath = [ "${config.home.homeDirectory}/.npm-global/bin" ];
+  home.sessionPath = [
+    "${config.home.homeDirectory}/.npm-global/bin"
+    "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  ];
 
   programs.zsh = {
     enable = true;
@@ -42,6 +45,12 @@ in
       m = "git switch main";
       cc = "claude --dangerously-skip-permissions";
       co = "codex --full-auto";
+      # Long-running shells (e.g. panes in a persistent multiplexer like herdr)
+      # inherit env vars from whenever their server started, including the
+      # __HM_*_SESS_VARS_SOURCED guards that make home-manager only export
+      # PATH/session vars once. That guard survives a plain `exec zsh`, so a
+      # rebuild's PATH/env changes never reach those panes until it's unset.
+      reload = "unset __HM_SESS_VARS_SOURCED __HM_ZSH_SESS_VARS_SOURCED; exec zsh -l";
     };
   };
 
@@ -67,6 +76,8 @@ in
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.config/herdr";
   home.file.".claude/settings.json".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.claude/settings.json";
+  home.file.".claude/statusline-command.sh".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.claude/statusline-command.sh";
 
   # Keep Pi's credential and runtime state local by linking only authored files and directories.
   home.file.".pi/agent/themes".source =
