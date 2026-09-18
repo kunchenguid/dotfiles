@@ -34,12 +34,24 @@
     onActivation.cleanup = "zap";  # remove anything not listed here
     onActivation.autoUpdate = true;
     onActivation.extraFlags = [ "--force" ];
+    taps = [
+      "databricks/tap"
+      "devproductivity/devx-cli"
+    ];
     brews = [
       "herdr"
+      # Not in nixpkgs / tap-only, so they stay on Homebrew.
+      "databricks/tap/databricks"
+      "devproductivity/devx-cli/devx-cli"
     ];
     casks = [
       "wezterm"
       "claude-code"
+      # JDKs: temurin tracks latest, the pinned ones are for older projects.
+      "temurin"
+      "temurin@17"
+      "temurin@21"
+      "temurin@25"
     ];
   };
 }

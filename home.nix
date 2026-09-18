@@ -16,6 +16,13 @@ in
     jq        # json on the command line
     lazygit
     neovim
+    tmux      # terminal multiplexer
+    # language runtimes and toolchains
+    nodejs_26 # matches the node 26 brew replaced; `nodejs` is the 24 LTS
+    go
+    uv        # python package/project manager
+    tfenv     # per-project terraform versions
+    ffmpeg
     # the font everything renders in
     nerd-fonts.hack
   ];
