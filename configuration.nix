@@ -1,45 +1,39 @@
-{ user, ... }:
-
+{ pkgs, ... }:
 {
-  # Determinate already manages the Nix daemon, so nix-darwin shouldn't.
+  # Determinate Nix manages the daemon
   nix.enable = false;
-
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.hostPlatform = "aarch64-darwin"; # use x86_64-darwin for Intel CPU
+  nixpkgs.hostPlatform = "aarch64-darwin";
 
-  system.primaryUser = user;
-  users.users.${user} = {
-    home = "/Users/${user}";
-  };
   system.stateVersion = 6;
+  system.primaryUser = "oibaf";
+
+  # SIP protects /etc/pam.d/sudo_local on recent macOS; leave it alone
+  security.pam.services.sudo_local.enable = false;
+
+  users.users.oibaf = {
+    home = "/Users/oibaf";
+  };
+
   system.defaults = {
-    NSGlobalDomain = {
-      AppleInterfaceStyle = "Dark";
-      KeyRepeat = 2;          # fast key repeat
-      InitialKeyRepeat = 15;  # short delay before repeat
-      _HIHideMenuBar = true;  # auto-hide the menu bar
-      AppleShowAllExtensions = true;
-    };
     dock.autohide = true;
-    finder.FXPreferredViewStyle = "Nlsv";  # list view by default
-    finder.CreateDesktop = false;          # clean desktop
-    trackpad.Clicking = true;              # tap to click
+    finder.AppleShowAllExtensions = true;
+    finder.FXPreferredViewStyle = "Nlsv";
+    NSGlobalDomain.AppleInterfaceStyle = "Dark";
+    NSGlobalDomain.InitialKeyRepeat = 15;
+    NSGlobalDomain.KeyRepeat = 2;
   };
-  nix-homebrew = {
-    enable = true;
-    inherit user;
-  };
+
+  # First activate: do not uninstall undeclared Homebrew packages
   homebrew = {
     enable = true;
-    onActivation.cleanup = "zap";  # remove anything not listed here
-    onActivation.autoUpdate = true;
-    onActivation.extraFlags = [ "--force" ];
-    brews = [
-      "herdr"
-    ];
+    onActivation.cleanup = "none";
     casks = [
       "wezterm"
       "claude-code"
+    ];
+    brews = [
+      "herdr"
     ];
   };
 }
