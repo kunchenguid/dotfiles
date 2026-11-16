@@ -3,7 +3,6 @@
     "type": "command",
     "command": "bash \"$HOME/.claude/statusline-command.sh\""
   },
-  "skipDangerousModePermissionPrompt": true,
   "theme": "dark-ansi",
   "model": "sonnet"
 }

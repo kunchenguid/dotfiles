@@ -112,7 +112,7 @@ automatic update.
 | **Autosuggestion** | Ghost-text completion from shell history; `Ctrl+F` accepts the suggestion (`bindkey '^f' autosuggest-accept`). |
 | **Syntax highlighting** | Commands turn green once they resolve to something valid, red otherwise — instant feedback before you hit Enter. |
 | **Starship** | The prompt: working directory, git branch/status, and command duration, with a purple `❯` on success and red on error. `add_newline = false` keeps it compact. |
-| **Aliases** | `..` (up a dir), `add`/`push`/`pull` (git shortcuts), `m` (switch to `main`), `cc` = `claude --dangerously-skip-permissions`, `co` = `codex --full-auto`. The last two are high-agency shortcuts — convenient, but worth knowing what they skip before using them. |
+| **Aliases** | `..` (up a dir), `add`/`push`/`pull` (git shortcuts), `m` (switch to `main`), `cc` = `claude --permission-mode auto`, `co` = `codex --full-auto`. The last two are high-agency shortcuts — convenient, but worth knowing what they skip before using them. |
 
 ## Neovim — the editor
 
@@ -149,7 +149,7 @@ register.
 | Tool | What it does here |
 |---|---|
 | **AGENTS.md** (`home/AGENTS.md`) | One shared instruction file, symlinked into `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and `~/.config/opencode/AGENTS.md` — Claude, Codex, and opencode all read the same personal agent policy instead of three drifting copies. |
-| **Claude Code `settings.json`** | Custom statusline command, `dark-ansi` theme, default model `sonnet`, and `skipDangerousModePermissionPrompt` (paired with the `cc` alias's `--dangerously-skip-permissions`). |
+| **Claude Code `settings.json`** | Custom statusline command, `dark-ansi` theme, default model `sonnet`. |
 | **Pi** *(optional, not vendored)* | A separate coding-agent CLI, installed from its own source (`pi.dev`), not a dependency this repo ships. Home Manager only manages the pieces below — everything else (auth, sessions, caches, package trees) is Pi's own runtime state. |
 
 ### Pi's layer, in detail
@@ -179,7 +179,7 @@ default.
 
 Aliases (not hotkeys, but muscle memory either way): `..` (up a dir), `add`
 (`git add .`), `push`/`pull`, `m` (checkout `main`), `cc` (`claude
---dangerously-skip-permissions`), `co` (`codex --full-auto`), `reload` (unsets
+--permission-mode auto`), `co` (`codex --full-auto`), `reload` (unsets
 the `__HM_*_SESS_VARS_SOURCED` guards and re-execs zsh, for shells - herdr
 panes especially - that predate a rebuild and are stuck on a stale `PATH`).
 

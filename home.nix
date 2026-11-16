@@ -43,7 +43,7 @@ in
       push = "git push";
       pull = "git pull";
       m = "git switch main";
-      cc = "claude --dangerously-skip-permissions";
+      cc = "claude --permission-mode auto";
       co = "codex --full-auto";
       # Long-running shells (e.g. panes in a persistent multiplexer like herdr)
       # inherit env vars from whenever their server started, including the
